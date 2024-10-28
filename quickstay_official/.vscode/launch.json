@@ -8,7 +8,7 @@
             "name": "quickstay_official",
             "request": "launch",
             "type": "dart",
-            "program": "lib/view_model/main.dart"
+            "program": "lib/main.dart"
         },
         {
             "name": "quickstay_official (profile mode)",

@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "531597869449",
+    "project_id": "quickstay-ab4ec",
+    "storage_bucket": "quickstay-ab4ec.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:531597869449:android:f4d31f288ffc9e43952158",
+        "android_client_info": {
+          "package_name": "com.example.quickstay_official"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBdS5E7RuiyP1Jz0a7Nuxb76WIVMDP7SVY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

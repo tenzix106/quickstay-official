@@ -1,4 +1,9 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:quickstay_official/global.dart';
 
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen({super.key});
@@ -16,6 +21,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
   TextEditingController _cityTextEditingController = TextEditingController();
   TextEditingController _countryTextEditingController = TextEditingController();
   TextEditingController _bioTextEditingController = TextEditingController();
+
+
+  File? imageFileOfUser;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -48,12 +56,13 @@ class _SignUpScreenState extends State<SignUpScreen> {
           ),
 
           const Text(
-            "Tell us about you: ",
+            "Tell us about Yourself ",
             style: TextStyle(
               fontSize: 30.0,
               fontWeight: FontWeight.bold,
               color: Color.fromARGB(255, 221, 102, 28),
             ),
+            textAlign: TextAlign.center,
           ),
 
           Padding(
@@ -92,6 +101,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           fontSize: 24,
                         ),
                         controller: _passwordTextEditingController,
+                        obscureText: true,
                         validator: (valuePassword)
                         {
                           if(valuePassword!.length < 5) {
@@ -203,8 +213,79 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 ]
               ),
             ),
-          )
+          ),
 
+          Padding(
+            padding: const EdgeInsets.only(top: 38.0),
+            child: MaterialButton(
+              onPressed: () async
+              {
+                var imageFile = await ImagePicker().pickImage(source: ImageSource.gallery);
+
+                if(imageFile != null)
+                {
+                  imageFileOfUser = File(imageFile.path);
+
+                  setState(() {
+                    imageFileOfUser;
+                  });
+                }
+              },
+              child: imageFileOfUser == null 
+                ? const Icon(Icons.add_a_photo) 
+                : CircleAvatar(
+                  radius: MediaQuery.of(context).size.width / 5.0,
+                  child: CircleAvatar(
+                    backgroundImage: FileImage(imageFileOfUser!),
+                    radius: MediaQuery.of(context).size.width / 5.2,
+                  ),
+                ),
+            ),
+          ),
+
+          Padding(
+            padding: const EdgeInsets.only(top: 44, right: 40, left:40),
+              child: ElevatedButton(
+              onPressed: ()
+              {
+                if(!_formKey.currentState!.validate() || imageFileOfUser == null)
+                {
+                  Get.snackbar("Field Missing", "Please choose image and fill out the sign up form.");
+                  return;
+                }
+                if(_emailTextEditingController.text.isEmpty && _passwordTextEditingController.text.isEmpty)
+                {
+                  Get.snackbar("Field Missing", "Please fill out sign up form");
+                  return;
+                }
+
+                userViewModel.signUp(
+                  _emailTextEditingController.text.trim(),
+                  _passwordTextEditingController.text.trim(),
+                  _firstNameTextEditingController.text.trim(),
+                  _lastNameTextEditingController.text.trim(),
+                  _cityTextEditingController.text.trim(),
+                  _countryTextEditingController.text.trim(),
+                  _bioTextEditingController.text.trim(),
+                  imageFileOfUser,
+                );
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.blue,
+                ),
+                child: const Text(
+                  "Create Account",
+                  style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 22.0,
+                color: Colors.white,
+                ),
+              ),
+            ) ,
+            ),
+            const SizedBox(
+              height: 60,
+            ),
         ],
       )
       )

@@ -82,6 +82,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           fontSize: 24,
                         ),
                         controller: _passwordTextEditingController,
+                        obscureText: true,
                         validator: (valuePassword)
                         {
                           if(valuePassword!.length < 5) {
@@ -95,23 +96,26 @@ class _LoginScreenState extends State<LoginScreen> {
                     Padding(
                       padding: const EdgeInsets.only(top: 26.0),
                       child: ElevatedButton(
-                      onPressed: ()
-                        {
-
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.blue,
-                          padding: const EdgeInsets.symmetric(horizontal: 60)
+                        onPressed: ()
+                          {
+                            if(_formKey.currentState!.validate()) 
+                            {
+                              
+                            }
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.blue,
+                            padding: const EdgeInsets.symmetric(horizontal: 60)
+                          ),
+                          child: const Text(
+                            "Login",
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 22.0,
+                              color: Colors.white,
+                          ),
                         ),
-                        child: const Text(
-                          "Login",
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 22.0,
-                            color: Colors.white,
-                        ),
-                      ),
-                    ) ,
+                      ) ,
                     ),
                     TextButton(
                       onPressed: ()
@@ -131,7 +135,10 @@ class _LoginScreenState extends State<LoginScreen> {
                   ],
                 )
               )
-            )
+            ),
+            const SizedBox(
+              height: 60,
+            ),
           ],
       ))
     );
