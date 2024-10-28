@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:quickstay_official/view/signup_screen.dart';
 
 class LoginScreen extends StatefulWidget {
