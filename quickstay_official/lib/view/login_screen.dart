@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:quickstay_official/global.dart';
 import 'package:quickstay_official/view/signup_screen.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -96,11 +97,13 @@ class _LoginScreenState extends State<LoginScreen> {
                     Padding(
                       padding: const EdgeInsets.only(top: 26.0),
                       child: ElevatedButton(
-                        onPressed: ()
+                        onPressed: () async
                           {
                             if(_formKey.currentState!.validate()) 
                             {
-                              
+                              userViewModel.login(
+                                _emailTextEditingController.text.trim(),
+                                _passwordTextEditingController.text.trim());
                             }
                           },
                           style: ElevatedButton.styleFrom(

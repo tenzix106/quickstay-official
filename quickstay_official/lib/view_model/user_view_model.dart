@@ -8,9 +8,15 @@ import 'package:flutter/rendering.dart';
 import 'package:get/get.dart';
 import 'package:quickstay_official/model/app_constants.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:quickstay_official/model/user_model.dart';
+import 'package:quickstay_official/view/guestScreens/account_screen.dart';
+import 'package:quickstay_official/view/guest_home_screen.dart';
 
 class UserViewModel
 {
+
+  UserModel userModel = UserModel();
+
   signUp(email, password, firstName, lastName, city, country, bio, imageFileOfUser) async
   {
     Get.snackbar("Please wait...", "we are creating your account.");
@@ -38,6 +44,7 @@ class UserViewModel
         {
           addImageToFirebaseStorage(imageFileOfUser, currentUserID);
         });
+        Get.to(AccountScreen());
         Get.snackbar("Congratulations!", "Your account has been created.");
       });
     }
@@ -80,15 +87,22 @@ class UserViewModel
 
   login(email, password) async
   {
+    Get.snackbar("Please wait", "checking your credentials...");
     try
     {
       FirebaseAuth.instance.signInWithEmailAndPassword(
         email: email, 
         password: password,
-      ).then((result)
+      ).then((result) async
       {
         String currentUserID = result.user!.uid;
         AppConstants.currentUser.id = currentUserID;
+
+        await getUserInfoFromFirestore(currentUserID);
+        await getImageFromStorage(currentUserID);
+
+        Get.snackbar("Logged in", "you are logged in successfully."); 
+        Get.to(GuestHomeScreen());
       });
     }
     catch(e)
@@ -100,5 +114,48 @@ class UserViewModel
   getUserInfoFromFirestore(userID) async
   {
     DocumentSnapshot snapshot = await FirebaseFirestore.instance.collection("users").doc(userID).get();
+    AppConstants.currentUser.snapshot = snapshot;
+    AppConstants.currentUser.firstName = snapshot["firstName"];
+    AppConstants.currentUser.lastName = snapshot["lastName"];
+    AppConstants.currentUser.email = snapshot['email'] ?? "";
+    AppConstants.currentUser.bio = snapshot['bio'] ?? "";
+    AppConstants.currentUser.city = snapshot['city'] ?? "";
+    AppConstants.currentUser.country = snapshot['country'] ?? "";
+    AppConstants.currentUser.isHost = snapshot['isHost'] ?? false;
+  }
+
+  getImageFromStorage(userID) async
+  {
+    if (AppConstants.currentUser.displayImage != null)
+    {
+      return AppConstants.currentUser.displayImage;
+    }
+
+    final imageDataInBytes = await FirebaseStorage.instance.ref()
+      .child("userImages")
+      .child(userID)
+      .child(userID + ".png")
+      .getData(1024 * 1024);
+
+    AppConstants.currentUser.displayImage = MemoryImage(imageDataInBytes!); 
+
+    return AppConstants.currentUser.displayImage;
+  }
+
+  becomeHost(String userID) async
+  {
+    UserModel userModel = UserModel();
+    userModel.isHost = true;
+
+    Map<String, dynamic> dataMap =
+    {
+      "isHost": true,
+    };
+    await FirebaseFirestore.instance.collection("users").doc(userID).update(dataMap);
+
+  }
+  modifyCurrentlyHosting(bool isHosting)
+  {
+    userModel.isCurrentlyHosting = isHosting;
   }
 }
