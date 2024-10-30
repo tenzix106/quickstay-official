@@ -98,6 +98,23 @@ class PostingModel {
     return displayImages;
   }
 
+  getFirstImageFromStorage() async {
+    if (displayImages!.isNotEmpty) {
+      return displayImages!.first;
+    }
+
+    final imageData = await FirebaseStorage.instance
+        .ref()
+        .child("postingImages")
+        .child(id!)
+        .child(imageNames!.first)
+        .getData(1024 * 1024);
+
+    displayImages!.add(MemoryImage(imageData!));
+
+    return displayImages!.first;
+  }
+
   getAmenitiesString() {
     if (amenities!.isEmpty) {
       return "";
@@ -106,5 +123,21 @@ class PostingModel {
     String amenitiesString = amenities.toString();
 
     return amenitiesString.substring(1, amenitiesString.length - 1);
+  }
+
+  double getCurrentRating() {
+    if (reviews!.length == 0) {
+      return 4;
+    }
+
+    double rating = 0;
+
+    reviews!.forEach((review) {
+      rating += review.rating!;
+    });
+
+    rating /= reviews!.length;
+
+    return rating;
   }
 }
