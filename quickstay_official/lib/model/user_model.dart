@@ -1,9 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:quickstay_official/model/booking_model.dart';
 import 'package:quickstay_official/model/contact_model.dart';
+import 'package:quickstay_official/model/posting_model.dart';
+import 'package:quickstay_official/model/review_model.dart';
 
-class UserModel extends ContactModel
-{
+class UserModel extends ContactModel {
   String? email;
   String? password;
   String? bio;
@@ -12,6 +14,11 @@ class UserModel extends ContactModel
   bool? isHost;
   bool? isCurrentlyHosting;
   DocumentSnapshot? snapshot;
+
+  List<BookingModel>? bookings;
+  List<ReviewModel>? reviews;
+
+  List<PostingModel>? myPostings;
 
   UserModel({
     String id = "",
@@ -22,15 +29,35 @@ class UserModel extends ContactModel
     this.bio = "",
     this.city = "",
     this.country = "",
-  }):super (id: id, firstName: firstName, lastName: lastName, displayImage: displayImage)
-  {
+  }) : super(
+            id: id,
+            firstName: firstName,
+            lastName: lastName,
+            displayImage: displayImage) {
     isHost = false;
     isCurrentlyHosting = false;
+
+    bookings = [];
+    reviews = [];
+    myPostings = [];
   }
-  Future<void> saveUserToFirebase() async
-  {
-    Map<String, dynamic> dataMap = 
-    {
+
+  addPostingToMyPostings(PostingModel posting) async {
+    myPostings!.add(posting);
+
+    List<String> myPostingIDsList = [];
+
+    myPostings!.forEach((element) {
+      myPostingIDsList.add(element.id!);
+    });
+
+    await FirebaseFirestore.instance.collection("users").doc(id).update({
+      'myPostingIDs': myPostingIDsList,
+    });
+  }
+
+  Future<void> saveUserToFirebase() async {
+    Map<String, dynamic> dataMap = {
       "bio": bio,
       "city": city,
       "country": country,
@@ -43,6 +70,4 @@ class UserModel extends ContactModel
       "earnings": 0,
     };
   }
-
-
 }
