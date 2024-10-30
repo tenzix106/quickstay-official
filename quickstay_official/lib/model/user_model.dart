@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:quickstay_official/global.dart';
 import 'package:quickstay_official/model/booking_model.dart';
 import 'package:quickstay_official/model/contact_model.dart';
 import 'package:quickstay_official/model/posting_model.dart';
@@ -42,6 +43,21 @@ class UserModel extends ContactModel {
     myPostings = [];
   }
 
+  Future<void> saveUserToFirebase() async {
+    Map<String, dynamic> dataMap = {
+      "bio": bio,
+      "city": city,
+      "country": country,
+      "email": email,
+      "firstName": firstName,
+      "lastName": lastName,
+      "isHost": false,
+      "myPostingIDs": [],
+      "savedPostingIDs": [],
+      "earnings": 0,
+    };
+  }
+
   addPostingToMyPostings(PostingModel posting) async {
     myPostings!.add(posting);
 
@@ -56,18 +72,17 @@ class UserModel extends ContactModel {
     });
   }
 
-  Future<void> saveUserToFirebase() async {
-    Map<String, dynamic> dataMap = {
-      "bio": bio,
-      "city": city,
-      "country": country,
-      "email": email,
-      "firstName": firstName,
-      "lastName": lastName,
-      "isHost": false,
-      "myPostingIDs": [],
-      "savedPostingIDs": [],
-      "earnings": 0,
-    };
+  getMyPostingFromFirestore() async {
+    List<String> myPostingIDs =
+        List<String>.from(snapshot!["myPostingIDs"]) ?? [];
+
+    for (String postingID in myPostingIDs) {
+      PostingModel posting = PostingModel(id: postingID);
+
+      await posting.getPostingInfoFromFirestore();
+      await posting.getAllImagesFromStorage();
+
+      myPostings!.add(posting);
+    }
   }
 }

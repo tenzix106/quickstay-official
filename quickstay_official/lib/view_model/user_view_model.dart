@@ -12,22 +12,19 @@ import 'package:quickstay_official/model/user_model.dart';
 import 'package:quickstay_official/view/guestScreens/account_screen.dart';
 import 'package:quickstay_official/view/guest_home_screen.dart';
 
-class UserViewModel
-{
-
+class UserViewModel {
   UserModel userModel = UserModel();
 
-  signUp(email, password, firstName, lastName, city, country, bio, imageFileOfUser) async
-  {
+  signUp(email, password, firstName, lastName, city, country, bio,
+      imageFileOfUser) async {
     Get.snackbar("Please wait...", "we are creating your account.");
-    try
-    {
-      await FirebaseAuth.instance.createUserWithEmailAndPassword(
-
+    try {
+      await FirebaseAuth.instance
+          .createUserWithEmailAndPassword(
         email: email,
         password: password,
-      ).then((result)
-      async {
+      )
+          .then((result) async {
         String currentUserID = result.user!.uid;
 
         AppConstants.currentUser.id = currentUserID;
@@ -39,26 +36,22 @@ class UserViewModel
         AppConstants.currentUser.email = email;
         AppConstants.currentUser.password = password;
 
-        await saveUserToFirebase(bio, city, country, email, firstName, lastName, currentUserID)
-        .whenComplete(()
-        {
+        await saveUserToFirebase(
+                bio, city, country, email, firstName, lastName, currentUserID)
+            .whenComplete(() {
           addImageToFirebaseStorage(imageFileOfUser, currentUserID);
         });
         Get.to(AccountScreen());
         Get.snackbar("Congratulations!", "Your account has been created.");
       });
-    }
-    catch(e)
-    {
+    } catch (e) {
       Get.snackbar("Error: ", e.toString());
     }
   }
 
-
-  Future<void> saveUserToFirebase(bio, city, country, email, firstName, lastName, id) async
-  {
-    Map<String, dynamic> dataMap = 
-    {
+  Future<void> saveUserToFirebase(
+      bio, city, country, email, firstName, lastName, id) async {
+    Map<String, dynamic> dataMap = {
       "bio": bio,
       "city": city,
       "country": country,
@@ -73,47 +66,46 @@ class UserViewModel
 
     await FirebaseFirestore.instance.collection("users").doc(id).set(dataMap);
   }
-  addImageToFirebaseStorage(File imageFileOfUser, currentUserID) async
-  {
-    Reference referenceStorage = FirebaseStorage.instance.ref()
-      .child("userImages")
-      .child(currentUserID)
-      .child(currentUserID + ".png");
-    await referenceStorage.putFile(imageFileOfUser).whenComplete((){});
 
-    AppConstants.currentUser.displayImage = MemoryImage(imageFileOfUser.readAsBytesSync());
+  addImageToFirebaseStorage(File imageFileOfUser, currentUserID) async {
+    Reference referenceStorage = FirebaseStorage.instance
+        .ref()
+        .child("userImages")
+        .child(currentUserID)
+        .child(currentUserID + ".png");
+    await referenceStorage.putFile(imageFileOfUser).whenComplete(() {});
+
+    AppConstants.currentUser.displayImage =
+        MemoryImage(imageFileOfUser.readAsBytesSync());
   }
 
-
-  login(email, password) async
-  {
+  login(email, password) async {
     Get.snackbar("Please wait", "checking your credentials...");
-    try
-    {
-      FirebaseAuth.instance.signInWithEmailAndPassword(
-        email: email, 
+    try {
+      FirebaseAuth.instance
+          .signInWithEmailAndPassword(
+        email: email,
         password: password,
-      ).then((result) async
-      {
+      )
+          .then((result) async {
         String currentUserID = result.user!.uid;
         AppConstants.currentUser.id = currentUserID;
 
         await getUserInfoFromFirestore(currentUserID);
         await getImageFromStorage(currentUserID);
+        await AppConstants.currentUser.getMyPostingFromFirestore();
 
-        Get.snackbar("Logged in", "you are logged in successfully."); 
+        Get.snackbar("Logged in", "you are logged in successfully.");
         Get.to(GuestHomeScreen());
       });
-    }
-    catch(e)
-    {
+    } catch (e) {
       Get.snackbar("Error: ", e.toString());
     }
   }
 
-  getUserInfoFromFirestore(userID) async
-  {
-    DocumentSnapshot snapshot = await FirebaseFirestore.instance.collection("users").doc(userID).get();
+  getUserInfoFromFirestore(userID) async {
+    DocumentSnapshot snapshot =
+        await FirebaseFirestore.instance.collection("users").doc(userID).get();
     AppConstants.currentUser.snapshot = snapshot;
     AppConstants.currentUser.firstName = snapshot["firstName"];
     AppConstants.currentUser.lastName = snapshot["lastName"];
@@ -124,38 +116,37 @@ class UserViewModel
     AppConstants.currentUser.isHost = snapshot['isHost'] ?? false;
   }
 
-  getImageFromStorage(userID) async
-  {
-    if (AppConstants.currentUser.displayImage != null)
-    {
+  getImageFromStorage(userID) async {
+    if (AppConstants.currentUser.displayImage != null) {
       return AppConstants.currentUser.displayImage;
     }
 
-    final imageDataInBytes = await FirebaseStorage.instance.ref()
-      .child("userImages")
-      .child(userID)
-      .child(userID + ".png")
-      .getData(1024 * 1024);
+    final imageDataInBytes = await FirebaseStorage.instance
+        .ref()
+        .child("userImages")
+        .child(userID)
+        .child(userID + ".png")
+        .getData(1024 * 1024);
 
-    AppConstants.currentUser.displayImage = MemoryImage(imageDataInBytes!); 
+    AppConstants.currentUser.displayImage = MemoryImage(imageDataInBytes!);
 
     return AppConstants.currentUser.displayImage;
   }
 
-  becomeHost(String userID) async
-  {
+  becomeHost(String userID) async {
     UserModel userModel = UserModel();
     userModel.isHost = true;
 
-    Map<String, dynamic> dataMap =
-    {
+    Map<String, dynamic> dataMap = {
       "isHost": true,
     };
-    await FirebaseFirestore.instance.collection("users").doc(userID).update(dataMap);
-
+    await FirebaseFirestore.instance
+        .collection("users")
+        .doc(userID)
+        .update(dataMap);
   }
-  modifyCurrentlyHosting(bool isHosting)
-  {
+
+  modifyCurrentlyHosting(bool isHosting) {
     userModel.isCurrentlyHosting = isHosting;
   }
 }

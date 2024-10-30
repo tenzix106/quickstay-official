@@ -12,7 +12,9 @@ import 'package:quickstay_official/view/host_home_screen.dart';
 import 'package:quickstay_official/widgets/amenities_ui.dart';
 
 class CreatePostingsScreen extends StatefulWidget {
-  const CreatePostingsScreen({super.key});
+  PostingModel? posting;
+
+  CreatePostingsScreen({super.key, this.posting});
 
   @override
   State<CreatePostingsScreen> createState() => _CreatePostingsScreenState();
