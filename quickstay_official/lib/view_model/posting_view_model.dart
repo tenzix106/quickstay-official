@@ -11,7 +11,7 @@ class PostingViewModel {
     Map<String, dynamic> dataMap = {
       "address": postingModel.address,
       "amenities": postingModel.amenities,
-      "bathrooms": postingModel.bathroom,
+      "bathrooms": postingModel.bathrooms,
       "description": postingModel.description,
       "beds": postingModel.beds,
       "city": postingModel.city,
@@ -29,6 +29,31 @@ class PostingViewModel {
     postingModel.id = ref.id;
 
     await AppConstants.currentUser.addPostingToMyPostings(postingModel);
+  }
+
+  updatePostingInfoToFirestore() async {
+    postingModel.setImagesName();
+
+    Map<String, dynamic> dataMap = {
+      "address": postingModel.address,
+      "amenities": postingModel.amenities,
+      "bathrooms": postingModel.bathrooms,
+      "description": postingModel.description,
+      "beds": postingModel.beds,
+      "city": postingModel.city,
+      "country": postingModel.country,
+      "hostId": AppConstants.currentUser.id,
+      "imageNames": postingModel.imageNames,
+      "name": postingModel.name,
+      "price": postingModel.price,
+      "rating": 3.5,
+      "type": postingModel.type,
+    };
+
+    FirebaseFirestore.instance
+        .collection("postings")
+        .doc(postingModel.id)
+        .update(dataMap);
   }
 
   addImagesToFirebaseStorage() async {

@@ -8,6 +8,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:quickstay_official/global.dart';
 import 'package:quickstay_official/model/app_constants.dart';
 import 'package:quickstay_official/model/posting_model.dart';
+import 'package:quickstay_official/view/guest_home_screen.dart';
 import 'package:quickstay_official/view/host_home_screen.dart';
 import 'package:quickstay_official/widgets/amenities_ui.dart';
 
@@ -50,25 +51,49 @@ class _CreatePostingsScreenState extends State<CreatePostingsScreen> {
   List<MemoryImage>? _imagesList;
 
   initializeValues() {
-    _priceTextEditingController = TextEditingController(text: "");
-    _descriptionTextEditingController = TextEditingController(text: "");
-    _addressTextEditingController = TextEditingController(text: "");
-    _cityTextEditingController = TextEditingController(text: "");
-    _countryTextEditingController = TextEditingController(text: "");
-    _amenitiesTextEditingController = TextEditingController(text: "");
+    if (widget.posting == null) {
+      _nameTextEditingController = TextEditingController(text: "");
+      _priceTextEditingController = TextEditingController(text: "");
+      _descriptionTextEditingController = TextEditingController(text: "");
+      _addressTextEditingController = TextEditingController(text: "");
+      _cityTextEditingController = TextEditingController(text: "");
+      _countryTextEditingController = TextEditingController(text: "");
+      _amenitiesTextEditingController = TextEditingController(text: "");
 
-    residenceTypeSelected = residenceTypes.first;
+      residenceTypeSelected = residenceTypes.first;
 
-    _beds = {
-      'small': 0,
-      'medium': 0,
-      'large': 0,
-    };
-    _bathrooms = {
-      'full': 0,
-      'half': 0,
-    };
-    _imagesList = [];
+      _beds = {
+        'small': 0,
+        'medium': 0,
+        'large': 0,
+      };
+      _bathrooms = {
+        'full': 0,
+        'half': 0,
+      };
+      _imagesList = [];
+    } else {
+      _nameTextEditingController =
+          TextEditingController(text: widget.posting!.name);
+      _priceTextEditingController =
+          TextEditingController(text: widget.posting!.price.toString());
+      _descriptionTextEditingController =
+          TextEditingController(text: widget.posting!.description);
+      _addressTextEditingController =
+          TextEditingController(text: widget.posting!.address);
+      _cityTextEditingController =
+          TextEditingController(text: widget.posting!.city);
+      _countryTextEditingController =
+          TextEditingController(text: widget.posting!.country);
+      _amenitiesTextEditingController =
+          TextEditingController(text: widget.posting!.getAmenitiesString());
+      _beds = widget.posting!.beds;
+      _bathrooms = widget.posting!.bathrooms;
+      _imagesList = widget.posting!.displayImages;
+      residenceTypeSelected = widget.posting!.type!;
+    }
+
+    setState(() {});
   }
 
   _selectImageFromGallery(int index) async {
@@ -138,7 +163,7 @@ class _CreatePostingsScreenState extends State<CreatePostingsScreen> {
                     _amenitiesTextEditingController.text.split(",");
                 postingModel.type = residenceTypeSelected;
                 postingModel.beds = _beds;
-                postingModel.bathroom = _bathrooms;
+                postingModel.bathrooms = _bathrooms;
                 postingModel.displayImages = _imagesList;
 
                 postingModel.host =
@@ -147,15 +172,43 @@ class _CreatePostingsScreenState extends State<CreatePostingsScreen> {
                 postingModel.setImagesName();
 
                 // if this is new post old post
-                postingModel.rating = 3.5;
-                postingModel.bookings = [];
-                postingModel.reviews = [];
+                if (widget.posting == null) {
+                  postingModel.rating = 3.5;
+                  postingModel.bookings = [];
+                  postingModel.reviews = [];
 
-                await postingViewModel.addListingInfoToFirestore();
+                  await postingViewModel.addListingInfoToFirestore();
 
-                await postingViewModel.addImagesToFirebaseStorage();
+                  await postingViewModel.addImagesToFirebaseStorage();
 
-                Get.to(HostHomeScreen());
+                  Get.snackbar("New Listing",
+                      "Your New Listing is Uploaded Successfully!");
+                } else {
+                  postingModel.rating = widget.posting!.rating;
+                  postingModel.bookings = widget.posting!.bookings;
+                  postingModel.reviews = widget.posting!.reviews;
+                  postingModel.id = widget.posting!.id;
+
+                  for (int i = 0;
+                      i < AppConstants.currentUser.myPostings!.length;
+                      i++) {
+                    if (AppConstants.currentUser.myPostings![i].id ==
+                        postingModel.id) {
+                      AppConstants.currentUser.myPostings![i] = postingModel;
+                      break;
+                    }
+                  }
+
+                  await postingViewModel.updatePostingInfoToFirestore();
+
+                  Get.snackbar("Update Listing",
+                      "Your Listing is Updated Successfully!");
+                }
+
+                // clear posting model
+                postingModel = PostingModel();
+
+                Get.to(GuestHomeScreen());
               },
               icon: const Icon(Icons.upload),
             )

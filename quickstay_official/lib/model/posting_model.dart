@@ -23,7 +23,7 @@ class PostingModel {
   List<String>? amenities;
 
   Map<String, int>? beds;
-  Map<String, int>? bathroom;
+  Map<String, int>? bathrooms;
 
   List<BookingModel>? bookings;
   List<ReviewModel>? reviews;
@@ -42,7 +42,7 @@ class PostingModel {
     amenities = [];
 
     beds = {};
-    bathroom = {};
+    bathrooms = {};
     rating = 0;
 
     bookings = [];
@@ -65,14 +65,14 @@ class PostingModel {
 
   getPostingInfoFromSnapshot(DocumentSnapshot snapshot) {
     address = snapshot['address'] ?? "";
-    amenities = List<String>.from(snapshot['address']) ?? [];
-    bathroom = Map<String, int>.from(snapshot['bathroom']) ?? {};
+    amenities = List<String>.from(snapshot['amenities']) ?? [];
+    bathrooms = Map<String, int>.from(snapshot['bathrooms']) ?? {};
     beds = Map<String, int>.from(snapshot['beds']) ?? {};
     city = snapshot['city'] ?? "";
     country = snapshot['country'] ?? "";
     description = snapshot['description'] ?? "";
 
-    String hostID = snapshot['hostID'] ?? "";
+    String hostID = snapshot['hostId'] ?? "";
     host = ContactModel(id: hostID);
 
     imageNames = List<String>.from(snapshot['imageNames']) ?? [];
@@ -96,5 +96,15 @@ class PostingModel {
       displayImages!.add(MemoryImage(imageData!));
     }
     return displayImages;
+  }
+
+  getAmenitiesString() {
+    if (amenities!.isEmpty) {
+      return "";
+    }
+
+    String amenitiesString = amenities.toString();
+
+    return amenitiesString.substring(1, amenitiesString.length - 1);
   }
 }
