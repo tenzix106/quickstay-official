@@ -42,7 +42,6 @@ dependencies:
   firebase_storage: ^12.3.4
   image_picker: ^1.1.2
   custom_rating_bar:
-  pay:
 
 
 dev_dependencies:

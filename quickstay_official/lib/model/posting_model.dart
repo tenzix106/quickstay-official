@@ -1,9 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
-import 'package:quickstay_official/global.dart';
-import 'package:quickstay_official/model/app_constants.dart';
 import 'package:quickstay_official/model/booking_model.dart';
 import 'package:quickstay_official/model/contact_model.dart';
 import 'package:quickstay_official/model/review_model.dart';
@@ -142,108 +139,5 @@ class PostingModel {
     rating /= reviews!.length;
 
     return rating;
-  }
-
-  getHostFromFirestore() async {
-    await host!.getContactInfoFromFirestore();
-    await host!.getImageFromStorage();
-  }
-
-  int getGuestsNumber() {
-    int? numGuests = 0;
-    numGuests = numGuests + beds!['small']!;
-    numGuests = numGuests + beds!['medium']! * 2;
-    numGuests = numGuests + beds!['large']! * 2;
-
-    return numGuests;
-  }
-
-  String getBedroomText() {
-    String text = "";
-    if (beds!["small"] != 0) {
-      text += beds!["small"].toString() + " single/twin ";
-    }
-
-    if (beds!["medium"] != 0) {
-      text += beds!["medium"].toString() + " double ";
-    }
-
-    if (beds!["large"] != 0) {
-      text += beds!["large"].toString() + " queen/king ";
-    }
-
-    return text;
-  }
-
-  String getBathroomText() {
-    String text = "";
-    if (bathrooms!["full"] != 0) {
-      text += bathrooms!["full"].toString() + " full ";
-    }
-
-    if (bathrooms!["half"] != 0) {
-      text += bathrooms!["half"].toString() + " half ";
-    }
-
-    return text;
-  }
-
-  String getFullAddress() {
-    return address! + ", " + city! + ", " + country!;
-  }
-
-  getAllBookingsFromFirestore() async {
-    bookings = [];
-
-    QuerySnapshot snapshots = await FirebaseFirestore.instance
-        .collection('postings')
-        .doc(id)
-        .collection('bookings')
-        .get();
-
-    for (var snapshot in snapshots.docs) {
-      BookingModel newBooking = BookingModel();
-
-      await newBooking.getBookingInfoFromFirestoreFromPosting(this, snapshot);
-
-      bookings!.add(newBooking);
-    }
-  }
-
-  List<DateTime> getAllBookedDates() {
-    List<DateTime> dates = [];
-
-    bookings!.forEach((booking) {
-      dates.addAll(booking.dates!);
-    });
-
-    return dates;
-  }
-
-  Future<void> makeNewBooking(List<DateTime> dates, context) async {
-    Map<String, dynamic> bookingData = {
-      'dates': dates,
-      'name': AppConstants.currentUser.getFullNameOfUser(),
-      'userID': AppConstants.currentUser.id,
-      'payment': bookingPrice,
-    };
-
-    DocumentReference reference = await FirebaseFirestore.instance
-        .collection('postings')
-        .doc(id)
-        .collection('bookings')
-        .add(bookingData);
-
-    BookingModel newBooking = BookingModel();
-
-    newBooking.createBooking(
-        this, AppConstants.currentUser.createUserFromContact(), dates);
-    newBooking.id = reference.id;
-
-    bookings!.add(newBooking);
-    await AppConstants.currentUser
-        .addBookingToFirestore(newBooking, bookingPrice!);
-
-    Get.snackbar("Listing", "Booked Successfully!");
   }
 }
