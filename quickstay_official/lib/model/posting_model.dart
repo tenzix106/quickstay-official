@@ -67,23 +67,37 @@ class PostingModel {
   }
 
   getPostingInfoFromSnapshot(DocumentSnapshot snapshot) {
-    address = snapshot['address'] ?? "";
-    amenities = List<String>.from(snapshot['amenities']) ?? [];
-    bathrooms = Map<String, int>.from(snapshot['bathrooms']) ?? {};
-    beds = Map<String, int>.from(snapshot['beds']) ?? {};
-    city = snapshot['city'] ?? "";
-    country = snapshot['country'] ?? "";
-    description = snapshot['description'] ?? "";
+    address = snapshot.data().toString().contains('address') ? snapshot.get('address') : "";
 
-    String hostID = snapshot['hostId'] ?? "";
+    amenities = snapshot.data().toString().contains('amenities')
+        ? List<String>.from(snapshot.get('amenities'))
+        : [];
+
+    bathrooms = snapshot.data().toString().contains('bathrooms')
+        ? Map<String, int>.from(snapshot.get('bathrooms'))
+        : {};
+
+    beds = snapshot.data().toString().contains('beds')
+        ? Map<String, int>.from(snapshot.get('beds'))
+        : {};
+
+    city = snapshot.data().toString().contains('city') ? snapshot.get('city') : "";
+    country = snapshot.data().toString().contains('country') ? snapshot.get('country') : "";
+    description = snapshot.data().toString().contains('description') ? snapshot.get('description') : "";
+
+    String hostID = snapshot.data().toString().contains('hostId') ? snapshot.get('hostId') : "";
     host = ContactModel(id: hostID);
 
-    imageNames = List<String>.from(snapshot['imageNames']) ?? [];
-    name = snapshot['name'] ?? "";
-    price = snapshot['price'] ?? "";
-    rating = snapshot['rating'].toDouble() ?? 2.5;
-    type = snapshot['type'] ?? "";
+    imageNames = snapshot.data().toString().contains('imageNames')
+        ? List<String>.from(snapshot.get('imageNames'))
+        : [];
+
+    name = snapshot.data().toString().contains('name') ? snapshot.get('name') : "";
+    price = snapshot.data().toString().contains('price') ? snapshot.get('price').toDouble() : 0.0;
+    rating = snapshot.data().toString().contains('rating') ? snapshot.get('rating').toDouble() : 2.5;
+    type = snapshot.data().toString().contains('type') ? snapshot.get('type') : "";
   }
+
 
   getAllImagesFromStorage() async {
     displayImages = [];
@@ -102,21 +116,36 @@ class PostingModel {
   }
 
   getFirstImageFromStorage() async {
+    // Return the first display image if it's already loaded
     if (displayImages!.isNotEmpty) {
       return displayImages!.first;
     }
 
-    final imageData = await FirebaseStorage.instance
-        .ref()
-        .child("postingImages")
-        .child(id!)
-        .child(imageNames!.first)
-        .getData(1024 * 1024);
+    try {
+      // Attempt to retrieve the image data from Firebase Storage
+      final imageData = await FirebaseStorage.instance
+          .ref()
+          .child("postingImages")
+          .child(id!)
+          .child(imageNames!.first)
+          .getData(1024 * 1024);
 
-    displayImages!.add(MemoryImage(imageData!));
+      // Add the image data to displayImages if retrieval is successful
+      displayImages!.add(MemoryImage(imageData!));
 
-    return displayImages!.first;
+      return displayImages!.first;
+    } catch (e) {
+      if (e is FirebaseException && e.code == 'object-not-found') {
+        // Handle the case where the image does not exist
+        print('Image not found in Firebase Storage for id: $id');
+        return null; // or a placeholder image if preferred
+      } else {
+        // Re-throw other exceptions
+        rethrow;
+      }
+    }
   }
+
 
   getAmenitiesString() {
     if (amenities!.isEmpty) {
