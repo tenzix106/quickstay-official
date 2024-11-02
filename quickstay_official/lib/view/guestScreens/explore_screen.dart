@@ -1,8 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:get/get_connect/http/src/utils/utils.dart';
 import 'package:quickstay_official/model/posting_model.dart';
 import 'package:quickstay_official/widgets/posting_grid_tile_ui.dart';
+import 'package:quickstay_official/widgets/view_posting_screen.dart';
 
 class ExploreScreen extends StatefulWidget {
   const ExploreScreen({super.key});
@@ -146,7 +148,11 @@ class _ExploreScreenState extends State<ExploreScreen> {
                         cPosting.getPostingInfoFromSnapshot(snapshot);
 
                         return InkResponse(
-                          onTap: () {},
+                          onTap: () {
+                            Get.to(ViewPostingScreen(
+                              posting: cPosting,
+                            ));
+                          },
                           enableFeedback: true,
                           child: PostingGridTileUi(
                             posting: cPosting,

@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:quickstay_official/global.dart';
 import 'package:quickstay_official/model/booking_model.dart';
 import 'package:quickstay_official/model/contact_model.dart';
@@ -20,6 +21,7 @@ class UserModel extends ContactModel {
   List<ReviewModel>? reviews;
 
   List<PostingModel>? myPostings;
+  List<PostingModel>? savedPostings;
 
   UserModel({
     String id = "",
@@ -41,6 +43,7 @@ class UserModel extends ContactModel {
     bookings = [];
     reviews = [];
     myPostings = [];
+    savedPostings = [];
   }
 
   Future<void> saveUserToFirebase() async {
@@ -84,5 +87,78 @@ class UserModel extends ContactModel {
 
       myPostings!.add(posting);
     }
+  }
+
+  addSavedPosting(PostingModel posting) async {
+    for (var savedPosting in savedPostings!) {
+      if (savedPosting.id == posting.id) {
+        return;
+      }
+    }
+
+    savedPostings!.add(posting);
+
+    List<String> savedPostingIDs = [];
+
+    savedPostings!.forEach((savedPosting) {
+      savedPostingIDs.add(savedPosting.id!);
+    });
+
+    await FirebaseFirestore.instance.collection("users").doc(id).update({
+      'savedPostingIDs': savedPostingIDs,
+    });
+
+    Get.snackbar("Marked as Saved Posting", "Saved to your Favourite List!");
+  }
+
+  removeSavedPosting(PostingModel posting) async {
+    for (int i = 0; i < savedPostings!.length; i++) {
+      if (savedPostings![i].id == posting.id) {
+        savedPostings!.removeAt(i);
+        break;
+      }
+    }
+
+    List<String> savedPostingIDs = [];
+
+    savedPostings!.forEach((savedPosting) {
+      savedPostingIDs.add(savedPosting.id!);
+    });
+
+    await FirebaseFirestore.instance.collection("users").doc(id).update({
+      'savedPostingIDs': savedPostingIDs,
+    });
+
+    Get.snackbar(
+        "Listing Removed", "Listing removed from your Favourite List!");
+  }
+
+  Future<void> addBookingToFirestore(
+      BookingModel booking, double totalPrice) async {
+    String earningOld = "";
+
+    await FirebaseFirestore.instance
+        .collection("users")
+        .doc(id)
+        .get()
+        .then((dataSnap) {
+      earningOld = dataSnap["earnings"].toString();
+    });
+
+    Map<String, dynamic> data = {
+      'dates': booking.dates,
+      'postingID': booking.posting!.id!
+    };
+
+    await FirebaseFirestore.instance
+        .doc('users/${id}/bookings/${booking.id}')
+        .set(data);
+
+    await FirebaseFirestore.instance.collection("users").doc(id).update({
+      "earnings": totalPrice + int.parse(earningOld),
+    });
+    bookings!.add(booking);
+
+    //await addBookingConversation(booking);
   }
 }
