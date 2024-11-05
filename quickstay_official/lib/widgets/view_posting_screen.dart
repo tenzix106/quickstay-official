@@ -130,6 +130,7 @@ class _ViewPostingScreenState extends State<ViewPostingScreen> {
                               onPressed: () {
                                 Get.to(BookListingScreen(
                                   posting: posting,
+                                  hostID: posting!.host!.id!,
                                 ));
                               },
                               child: const Text(

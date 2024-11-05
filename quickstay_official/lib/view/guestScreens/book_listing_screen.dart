@@ -11,9 +11,12 @@ import 'package:quickstay_official/widgets/calendar_ui.dart';
 
 class BookListingScreen extends StatefulWidget {
   PostingModel? posting;
+  String? hostID;
+
   BookListingScreen({
     super.key,
     this.posting,
+    this.hostID,
   });
 
   @override
@@ -67,7 +70,9 @@ class _BookListingScreenState extends State<BookListingScreen> {
       return;
     }
 
-    posting!.makeNewBooking(selectedDates, context).whenComplete(() {
+    posting!
+        .makeNewBooking(selectedDates, context, widget.hostID)
+        .whenComplete(() {
       Get.back();
     });
   }
