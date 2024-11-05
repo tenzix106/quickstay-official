@@ -48,7 +48,7 @@ class ContactModel {
         .child("userImages")
         .child(id!)
         .child("$id.png")
-        .getData(1024 * 1024);
+        .getData(2048 * 2048);
 
     displayImage = MemoryImage(imageData!);
 

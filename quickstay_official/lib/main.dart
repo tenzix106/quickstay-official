@@ -2,18 +2,22 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:quickstay_official/view/splash.dart';
+import 'package:quickstay_official/firebase_options.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  await Firebase.initializeApp();
+  // Initialize Firebase with the options from your Firebase project
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform, // This line uses the generated options
+  );
+  
   runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return GetMaterialApp(

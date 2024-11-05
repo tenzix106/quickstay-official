@@ -18,6 +18,7 @@ class PostingModel {
   String? city;
   String? country;
   double? rating;
+  bool? verified;
 
   ContactModel? host;
 
@@ -50,6 +51,8 @@ class PostingModel {
 
     bookings = [];
     reviews = [];
+
+    verified = false;
   }
 
   setImagesName() {
@@ -65,6 +68,52 @@ class PostingModel {
 
     getPostingInfoFromSnapshot(snapshot);
   }
+
+  Future<List<PostingModel>> getUnverifiedPostingsFromFirestore() async {
+    List<PostingModel> unverifiedPostings = [];
+
+    // Fetch unverified postings from Firestore
+    final querySnapshot = await FirebaseFirestore.instance
+        .collection('postings')
+        .where('verified', isEqualTo: false)
+        .get();
+
+    print("Number of unverified postings: ${querySnapshot.docs.length}");
+
+    // Map each document snapshot to a PostingModel
+    for (var doc in querySnapshot.docs) {
+      PostingModel posting = PostingModel(id: doc.id);
+      posting.getUnverifiedPostingInfoFromSnapshot(doc);
+      posting.getAllImagesFromStorage();
+      unverifiedPostings.add(posting);
+    }
+
+    return unverifiedPostings;
+  }
+  getUnverifiedPostingInfoFromSnapshot(DocumentSnapshot snapshot) {
+    address = snapshot['address'] ?? "";
+    print(address);
+    amenities = List<String>.from(snapshot['amenities'] ?? []);
+    bathrooms = Map<String, int>.from(snapshot['bathrooms'] ?? {});
+    beds = Map<String, int>.from(snapshot['beds'] ?? {});
+    city = snapshot['city'] ?? "";
+    country = snapshot['country'] ?? "";
+    description = snapshot['description'] ?? "";
+    
+    String hostID = snapshot['hostId'] ?? "";
+    host = ContactModel(id: hostID);
+
+    imageNames = List<String>.from(snapshot['imageNames'] ?? []);
+    print(imageNames);
+    name = snapshot['name'] ?? "";
+    price = snapshot['price'] ?? "";
+    rating = snapshot['rating']?.toDouble() ?? 2.5;
+    type = snapshot['type'] ?? "";
+    verified = snapshot['verified'] ?? false;
+  }
+
+  getUnverifiedPostings() async
+  {}
 
   getPostingInfoFromSnapshot(DocumentSnapshot snapshot) {
     address = snapshot['address'] ?? "";
@@ -94,7 +143,7 @@ class PostingModel {
           .child("postingImages")
           .child(id!)
           .child(imageNames![i])
-          .getData(1024 * 1024);
+          .getData(2048 * 2048);
 
       displayImages!.add(MemoryImage(imageData!));
     }
@@ -111,7 +160,7 @@ class PostingModel {
         .child("postingImages")
         .child(id!)
         .child(imageNames!.first)
-        .getData(1024 * 1024);
+        .getData(2048 * 2048);
 
     displayImages!.add(MemoryImage(imageData!));
 

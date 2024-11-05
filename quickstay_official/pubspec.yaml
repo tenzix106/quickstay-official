@@ -44,6 +44,7 @@ dependencies:
   custom_rating_bar:
   pay:
   timeago:
+  firebase_analytics: ^11.3.3
 
 
 dev_dependencies:

@@ -22,6 +22,7 @@ class PostingViewModel {
       "price": postingModel.price,
       "rating": 3.5,
       "type": postingModel.type,
+      "verified": false,
     };
 
     DocumentReference ref =

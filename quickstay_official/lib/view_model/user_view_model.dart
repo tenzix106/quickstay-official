@@ -9,6 +9,7 @@ import 'package:get/get.dart';
 import 'package:quickstay_official/model/app_constants.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:quickstay_official/model/user_model.dart';
+import 'package:quickstay_official/view/admin_home_screen.dart';
 import 'package:quickstay_official/view/guestScreens/account_screen.dart';
 import 'package:quickstay_official/view/guest_home_screen.dart';
 
@@ -41,7 +42,7 @@ class UserViewModel {
             .whenComplete(() {
           addImageToFirebaseStorage(imageFileOfUser, currentUserID);
         });
-        Get.to(AccountScreen());
+        Get.to(GuestHomeScreen());
         Get.snackbar("Congratulations!", "Your account has been created.");
       });
     } catch (e) {
@@ -82,25 +83,50 @@ class UserViewModel {
   login(email, password) async {
     Get.snackbar("Please wait", "checking your credentials...");
     try {
-      FirebaseAuth.instance
-          .signInWithEmailAndPassword(
-        email: email,
-        password: password,
-      )
-          .then((result) async {
-        String currentUserID = result.user!.uid;
-        AppConstants.currentUser.id = currentUserID;
 
-        await getUserInfoFromFirestore(currentUserID);
-        await getImageFromStorage(currentUserID);
-        await AppConstants.currentUser.getMyPostingFromFirestore();
+      var adminSnapshot = await FirebaseFirestore.instance
+      .collection('admins')
+      .where('email', isEqualTo: email).get();
 
-        Get.snackbar("Logged in", "you are logged in successfully.");
-        Get.to(GuestHomeScreen());
-      });
-    } catch (e) {
-      Get.snackbar("Error: ", e.toString());
-    }
+      if(adminSnapshot.docs.isNotEmpty)
+      {
+        await FirebaseAuth.instance.signInWithEmailAndPassword(
+          email: email, 
+          password: password
+        ).then((result) async
+        {
+          String currentUserID = result.user!.uid;
+          AppConstants.currentUser.id = currentUserID;
+
+          await getUserInfoFromFirestore(currentUserID);
+          await getImageFromStorage(currentUserID);
+
+          Get.snackbar("Logged in", "Welcome, Admin!");
+          Get.to(AdminHomeScreen());
+        });
+      } 
+      else
+      {
+        FirebaseAuth.instance
+            .signInWithEmailAndPassword(
+          email: email,
+          password: password,
+        )
+            .then((result) async {
+          String currentUserID = result.user!.uid;
+          AppConstants.currentUser.id = currentUserID;
+
+          await getUserInfoFromFirestore(currentUserID);
+          await getImageFromStorage(currentUserID);
+          await AppConstants.currentUser.getMyPostingFromFirestore();
+
+          Get.snackbar("Logged in", "you are logged in successfully.");
+          Get.to(GuestHomeScreen());
+        });
+      }
+      } catch (e) {
+        Get.snackbar("Error: ", e.toString());
+      }
   }
 
   getUserInfoFromFirestore(userID) async {
@@ -126,7 +152,7 @@ class UserViewModel {
         .child("userImages")
         .child(userID)
         .child(userID + ".png")
-        .getData(1024 * 1024);
+        .getData(2048 * 2048);
 
     AppConstants.currentUser.displayImage = MemoryImage(imageDataInBytes!);
 

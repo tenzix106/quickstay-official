@@ -85,7 +85,19 @@ class UserModel extends ContactModel {
       'myPostingIDs': myPostingIDsList,
     });
   }
+  // getAdminPostingsFromFirestore() async
+  // {
+  //   QuerySnapshot allPostingsSnapshot = await FirebaseFirestore.instance.collection('postings').get();
+    
+  //   for (var doc in allPostingsSnapshot.docs) {
+  //     PostingModel posting = PostingModel(id: doc.id);
+  //     // Optionally fetch additional data for each posting if needed
+  //     await posting.getAllBookingsFromFirestore();
+  //     await posting.getAllImagesFromStorage();
 
+  //     myPostings!.add(posting);
+  // }
+  // }
   getMyPostingFromFirestore() async {
     List<String> myPostingIDs =
         List<String>.from(snapshot!["myPostingIDs"]) ?? [];
