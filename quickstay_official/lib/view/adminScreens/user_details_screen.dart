@@ -65,6 +65,45 @@ class _UserDetailsScreenState extends State<UserDetailsScreen> {
     }
   }
 
+  Future<void> _deleteUser () async {
+    // Show a confirmation dialog
+    final confirmDelete = await showDialog<bool>(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text('Confirm Delete'),
+          content: Text('Are you sure you want to delete this user? This action cannot be undone.'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(false),
+              child: Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(true),
+              child: Text('Delete'),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (confirmDelete == true) {
+      try {
+        // Delete the user from Firestore
+        await FirebaseFirestore.instance.collection('users').doc(widget.userID).delete();
+
+        // Show a success message
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('User  deleted successfully!')));
+
+        // Navigate back or close the screen after deletion
+        Navigator.of(context).pop();
+      } catch (e) {
+        // Handle errors (e.g., network issues)
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Failed to delete user: $e')));
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -75,6 +114,10 @@ class _UserDetailsScreenState extends State<UserDetailsScreen> {
           IconButton(
             icon: Icon(_isEditing ? Icons.save : Icons.edit),
             onPressed: _isEditing ? _saveChanges : _toggleEdit,
+          ),
+          IconButton(
+            icon: Icon(Icons.delete),
+            onPressed: _deleteUser ,
           ),
         ],
       ),
@@ -140,7 +183,7 @@ class _UserDetailsScreenState extends State<UserDetailsScreen> {
               ),
             ],
           ),
- ),
+        ),
       ),
     );
   }

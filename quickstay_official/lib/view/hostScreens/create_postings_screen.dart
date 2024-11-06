@@ -2,7 +2,6 @@ import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:get/get_connect/http/src/utils/utils.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:quickstay_official/global.dart';
@@ -114,11 +113,87 @@ class _CreatePostingsScreenState extends State<CreatePostingsScreen> {
     }
   }
 
+  Future<void> _deletePosting() async {
+    if (widget.posting != null) {
+      // Show a confirmation dialog before deleting
+      bool? confirmDelete = await showDialog<bool>(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: const Text("Delete Listing"),
+            content: const Text("Are you sure you want to delete this listing?"),
+            actions: <Widget>[
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(false),
+                child: const Text("Cancel"),
+              ),
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(true),
+                child: const Text("Delete"),
+              ),
+            ],
+          );
+        },
+      );
+
+      // If the user confirmed the deletion
+      if (confirmDelete == true) {
+        try {
+          // Delete the posting from Firestore
+          await FirebaseFirestore.instance
+              .collection('postings')
+              .doc(widget.posting!.id)
+              .delete();
+
+          await removePostingFromMyPostings(widget.posting!);
+
+          // Refresh the UI
+          setState(() {});
+
+          Get.snackbar("Delete Listing", "Your Listing has been deleted successfully!");
+          Get.to(HostHomeScreen());
+        } catch (e) {
+          // Handle any errors that occur during deletion
+          Get.snackbar("Error", "Failed to delete the listing: $e");
+        }
+      }
+    }
+  }
+    Future<void> removePostingFromMyPostings(PostingModel posting) async {
+    // Check if the posting exists in the local myPostings list
+    if (AppConstants.currentUser .myPostings!.contains(posting)) {
+      // Remove the posting from the local list
+      AppConstants.currentUser .myPostings!.remove(posting);
+
+      // Create a list to hold the updated posting IDs
+      List<String> myPostingIDsList = [];
+
+      // Populate the list with the remaining posting IDs
+      AppConstants.currentUser .myPostings!.forEach((element) {
+        myPostingIDsList.add(element.id!);
+      });
+
+      try {
+        // Update the user's myPostingIDs field in Firestore
+        await FirebaseFirestore.instance.collection("users").doc(AppConstants.currentUser .id).update({
+          'myPostingIDs': myPostingIDsList,
+        });
+
+        // Optionally, you can show a success message
+        Get.snackbar("Success", "Posting removed from your listings.");
+      } catch (e) {
+        // Handle any errors that occur during the Firestore update
+        Get.snackbar("Error", "Failed to update your postings: $e");
+      }
+    } else {
+      // Optionally handle the case where the posting was not found
+      Get.snackbar("Info", "Posting not found in your listings.");
+    }
+  }
+
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
-
     initializeValues();
   }
 
@@ -134,7 +209,7 @@ class _CreatePostingsScreenState extends State<CreatePostingsScreen> {
           title: const Text(
             "Create / Update a Listing",
             overflow: TextOverflow.ellipsis,
-            maxLines: 1, // keeps it on one line
+            maxLines: 1,
           ),
           actions: [
             IconButton(
@@ -171,14 +246,12 @@ class _CreatePostingsScreenState extends State<CreatePostingsScreen> {
 
                 postingModel.setImagesName();
 
-                // if this is new post old post
                 if (widget.posting == null) {
                   postingModel.rating = 3.5;
                   postingModel.bookings = [];
                   postingModel.reviews = [];
 
                   await postingViewModel.addListingInfoToFirestore();
-
                   await postingViewModel.addImagesToFirebaseStorage();
 
                   Get.snackbar("New Listing",
@@ -205,13 +278,16 @@ class _CreatePostingsScreenState extends State<CreatePostingsScreen> {
                       "Your Listing is Updated Successfully!");
                 }
 
-                // clear posting model
                 postingModel = PostingModel();
-
                 Get.to(HostHomeScreen());
               },
               icon: const Icon(Icons.upload),
-            )
+            ),
+            if (widget.posting != null) // Show delete button only if editing an existing posting
+              IconButton(
+                onPressed: _deletePosting,
+                icon: const Icon(Icons.delete),
+              ),
           ],
         ),
         body: Center(

@@ -58,6 +58,20 @@ class PostingViewModel {
         .update(dataMap);
   }
 
+  deletePostingInfoFromFirestore(String postingId) async
+  {
+      try {
+      await FirebaseFirestore.instance
+          .collection('postings')
+          .doc(postingId)
+          .delete();
+      print("Posting deleted successfully");
+    } catch (e) {
+      print("Error deleting posting: $e");
+      throw e; // Optionally rethrow the error for further handling
+    }
+  }
+
   addImagesToFirebaseStorage() async {
     for (int i = 0; i < postingModel.displayImages!.length; i++) {
       Reference ref = FirebaseStorage.instance

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get/get_connect/http/src/utils/utils.dart';
 import 'package:quickstay_official/model/posting_model.dart';
+import 'package:quickstay_official/view/adminScreens/verify_postings_screen.dart';
 import 'package:quickstay_official/widgets/posting_grid_tile_ui.dart';
 import 'package:quickstay_official/widgets/view_posting_screen.dart';
 
@@ -15,7 +16,9 @@ class ExploreScreen extends StatefulWidget {
 
 class _ExploreScreenState extends State<ExploreScreen> {
   TextEditingController controllerSearch = TextEditingController();
-  Stream stream = FirebaseFirestore.instance.collection('postings').snapshots();
+  Stream stream = FirebaseFirestore.instance.collection('postings')
+  .where('verified', isEqualTo: true)
+  .snapshots();
   String searchType = "";
 
   bool isNameButtonSelected = false;
