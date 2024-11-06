@@ -14,6 +14,18 @@ class SavedListingsScreen extends StatefulWidget {
 
 class _SavedListingsScreenState extends State<SavedListingsScreen> {
   @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+
+    loadSavedListing();
+  }
+
+  void loadSavedListing() async {
+    await AppConstants.currentUser.getMySavedPostingsFromFireStore();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.fromLTRB(25, 15, 25, 0),

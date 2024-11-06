@@ -9,9 +9,10 @@ void main() async {
 
   // Initialize Firebase with the options from your Firebase project
   await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform, // This line uses the generated options
+    options: DefaultFirebaseOptions
+        .currentPlatform, // This line uses the generated options
   );
-  
+
   runApp(const MyApp());
 }
 

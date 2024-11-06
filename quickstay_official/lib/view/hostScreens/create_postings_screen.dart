@@ -303,6 +303,7 @@ class _CreatePostingsScreenState extends State<CreatePostingsScreen> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
+                          // listing name
                           Padding(
                               padding: const EdgeInsets.only(top: 1.0),
                               child: TextFormField(
@@ -320,6 +321,7 @@ class _CreatePostingsScreenState extends State<CreatePostingsScreen> {
                                 },
                               )),
 
+                          // residence type
                           Padding(
                               padding: const EdgeInsets.only(top: 28.0),
                               child: DropdownButton(
@@ -348,6 +350,7 @@ class _CreatePostingsScreenState extends State<CreatePostingsScreen> {
                                     ),
                                   ))),
 
+                          // price
                           Padding(
                             padding: const EdgeInsets.only(top: 21.0),
                             child: Row(
@@ -384,7 +387,7 @@ class _CreatePostingsScreenState extends State<CreatePostingsScreen> {
                             ),
                           ),
 
-                          //description
+                          // description
                           Padding(
                               padding: const EdgeInsets.only(top: 1.0),
                               child: TextFormField(
@@ -404,7 +407,7 @@ class _CreatePostingsScreenState extends State<CreatePostingsScreen> {
                                 },
                               )),
 
-                          //Address
+                          // address
                           Padding(
                               padding: const EdgeInsets.only(top: 1.0),
                               child: TextFormField(
@@ -423,7 +426,43 @@ class _CreatePostingsScreenState extends State<CreatePostingsScreen> {
                                 },
                               )),
 
-                          //Beds
+                          // city
+                          Padding(
+                              padding: const EdgeInsets.only(top: 1.0),
+                              child: TextFormField(
+                                decoration:
+                                    const InputDecoration(labelText: "City"),
+                                style: const TextStyle(
+                                  fontSize: 25.0,
+                                ),
+                                controller: _cityTextEditingController,
+                                validator: (textInput) {
+                                  if (textInput!.isEmpty) {
+                                    return "Please Enter a Valid City";
+                                  }
+                                  return null;
+                                },
+                              )),
+
+                          // country
+                          Padding(
+                              padding: const EdgeInsets.only(top: 1.0),
+                              child: TextFormField(
+                                decoration: const InputDecoration(
+                                    labelText: "Listing Name"),
+                                style: const TextStyle(
+                                  fontSize: 25.0,
+                                ),
+                                controller: _countryTextEditingController,
+                                validator: (textInput) {
+                                  if (textInput!.isEmpty) {
+                                    return "Please Enter a Valid Name";
+                                  }
+                                  return null;
+                                },
+                              )),
+
+                          // beds
                           const Padding(
                             padding: EdgeInsets.only(top: 30.0),
                             child: Text(
@@ -440,7 +479,7 @@ class _CreatePostingsScreenState extends State<CreatePostingsScreen> {
                                 const EdgeInsets.only(left: 15, right: 15.0),
                             child: Column(
                               children: <Widget>[
-                                //Twin/Single bed
+                                // Twin/Single bed
                                 AmenitiesUI(
                                   type: 'Twin/Single',
                                   startValue: _beds!['small']!,
@@ -456,7 +495,7 @@ class _CreatePostingsScreenState extends State<CreatePostingsScreen> {
                                   },
                                 ),
 
-                                //Double Bed
+                                // Double Bed
                                 AmenitiesUI(
                                   type: 'Double',
                                   startValue: _beds!['medium']!,
@@ -472,7 +511,7 @@ class _CreatePostingsScreenState extends State<CreatePostingsScreen> {
                                   },
                                 ),
 
-                                //Queen/King bed
+                                // Queen/King bed
                                 AmenitiesUI(
                                   type: 'Queen/King',
                                   startValue: _beds!['large']!,
@@ -487,12 +526,11 @@ class _CreatePostingsScreenState extends State<CreatePostingsScreen> {
                                     _beds!['large'] = _beds!['large']! + 1;
                                   },
                                 )
-
-                                //Bathrooms
                               ],
                             ),
                           ),
 
+                          // Bathrooms
                           const Padding(
                             padding: EdgeInsets.only(top: 30.0),
                             child: Text(
@@ -546,6 +584,7 @@ class _CreatePostingsScreenState extends State<CreatePostingsScreen> {
                                   },
                                 ),
 
+                                // Amenities
                                 Padding(
                                     padding: const EdgeInsets.only(top: 21.0),
                                     child: TextFormField(
@@ -567,6 +606,7 @@ class _CreatePostingsScreenState extends State<CreatePostingsScreen> {
                                       minLines: 1,
                                     )),
 
+                                // Photos
                                 const Padding(
                                   padding: EdgeInsets.only(top: 30.0),
                                   child: Text(

@@ -16,14 +16,7 @@ class ViewPostingScreen extends StatefulWidget {
 
 class _ViewPostingScreenState extends State<ViewPostingScreen> {
   PostingModel? posting;
-
-  getRequiredInfo() async {
-    await posting!.getAllImagesFromStorage();
-
-    await posting!.getHostFromFirestore();
-
-    setState(() {});
-  }
+  bool isSaved = false;
 
   @override
   void initState() {
@@ -32,7 +25,61 @@ class _ViewPostingScreenState extends State<ViewPostingScreen> {
 
     posting = widget.posting;
 
-    getRequiredInfo();
+    loadPostingData();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    checkSavedStatus(); // Check status on every re-entry
+  }
+
+  // load the necessary data of the posting
+  Future<void> loadPostingData() async {
+    await posting!.getAllImagesFromStorage();
+
+    await posting!.getHostFromFirestore();
+
+    await AppConstants.currentUser.getMySavedPostingsFromFireStore();
+
+    checkSavedStatus();
+
+    // update the UI with the loaded data
+    setState(() {});
+  }
+
+  void checkSavedStatus() async {
+    await AppConstants.currentUser.getMySavedPostingsFromFireStore();
+
+    List<String> savedIDs = AppConstants.currentUser.savedPostings!
+        .map((posting) => posting.id!)
+        .toList();
+
+    print("Updated savedPosting IDs: $savedIDs");
+    print("Current Posting ID: ${posting!.id}");
+
+    setState(() {
+      isSaved = savedIDs.contains(posting!.id);
+      print("Check Saved Status After Refresh: $isSaved");
+    });
+  }
+
+  void toggleSavedPosting() async {
+    if (isSaved) {
+      await AppConstants.currentUser.removeSavedPosting(posting!);
+
+      setState(() {
+        isSaved = false;
+      });
+    } else {
+      await AppConstants.currentUser.addSavedPosting(posting!);
+
+      setState(() {
+        isSaved = true;
+      });
+    }
+
+    print("Save Listing Status: $isSaved");
   }
 
   @override
@@ -43,8 +90,8 @@ class _ViewPostingScreenState extends State<ViewPostingScreen> {
           decoration: const BoxDecoration(
             gradient: LinearGradient(
               colors: [
-                Colors.pinkAccent,
-                Colors.amber,
+                Color.fromARGB(255, 76, 215, 208),
+                Color.fromARGB(255, 164, 232, 224),
               ],
               begin: FractionalOffset(0.0, 0.0),
               end: FractionalOffset(1.0, 0.0),
@@ -59,9 +106,13 @@ class _ViewPostingScreenState extends State<ViewPostingScreen> {
         ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.save, color: Colors.white),
+            icon: Icon(
+              Icons.favorite,
+              color: isSaved ? Colors.red : Colors.white,
+            ),
             onPressed: () {
-              AppConstants.currentUser.addSavedPosting(posting!);
+              toggleSavedPosting();
+              //AppConstants.currentUser.addSavedPosting(posting!);
             },
           )
         ],
@@ -83,17 +134,14 @@ class _ViewPostingScreenState extends State<ViewPostingScreen> {
                 },
               ),
             ),
-            // posting name btn // book now btn
-            // description - profile pic
-            // apartments - beds - bathrooms
-            // amenities
-            // location
+
+            // posting details
+
             Padding(
               padding: const EdgeInsets.fromLTRB(14, 14, 14, 0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // posting name and price - book now btn
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -105,7 +153,7 @@ class _ViewPostingScreenState extends State<ViewPostingScreen> {
                           posting!.name!.toUpperCase(),
                           style: const TextStyle(
                             fontWeight: FontWeight.bold,
-                            fontSize: 16,
+                            fontSize: 24,
                           ),
                           maxLines: 3,
                         ),
@@ -117,8 +165,8 @@ class _ViewPostingScreenState extends State<ViewPostingScreen> {
                             decoration: const BoxDecoration(
                               gradient: LinearGradient(
                                 colors: [
-                                  Colors.pinkAccent,
-                                  Colors.amber,
+                                  Color.fromARGB(255, 76, 215, 208),
+                                  Color.fromARGB(255, 164, 232, 224),
                                 ],
                                 begin: FractionalOffset(0.0, 0.0),
                                 end: FractionalOffset(1.0, 0.0),
@@ -141,7 +189,7 @@ class _ViewPostingScreenState extends State<ViewPostingScreen> {
                           ),
                           Text(
                             'MYR ${posting!.price} / night',
-                            style: const TextStyle(fontSize: 14.0),
+                            style: const TextStyle(fontSize: 12.0),
                           ),
                         ],
                       )
@@ -150,7 +198,7 @@ class _ViewPostingScreenState extends State<ViewPostingScreen> {
 
                   // description - profile pic - name
                   Padding(
-                    padding: const EdgeInsets.only(top: 25.0, bottom: 25.0),
+                    padding: const EdgeInsets.only(top: 25.0, bottom: 35.0),
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -161,9 +209,9 @@ class _ViewPostingScreenState extends State<ViewPostingScreen> {
                             posting!.description!,
                             textAlign: TextAlign.justify,
                             style: const TextStyle(
-                              fontSize: 14,
+                              fontSize: 18,
                             ),
-                            maxLines: 5,
+                            maxLines: 6,
                           ),
                         ),
                         Column(
@@ -198,7 +246,7 @@ class _ViewPostingScreenState extends State<ViewPostingScreen> {
 
                   // apartments - beds - bathrooms
                   Padding(
-                    padding: const EdgeInsets.only(bottom: 25.0),
+                    padding: const EdgeInsets.only(bottom: 35.0),
                     child: ListView(
                       shrinkWrap: true,
                       children: [
@@ -231,7 +279,7 @@ class _ViewPostingScreenState extends State<ViewPostingScreen> {
                   ),
 
                   Padding(
-                    padding: const EdgeInsets.only(top: 5.0, bottom: 25),
+                    padding: const EdgeInsets.only(top: 25.0, bottom: 25),
                     child: GridView.count(
                       shrinkWrap: true,
                       crossAxisCount: 2,
@@ -268,11 +316,11 @@ class _ViewPostingScreenState extends State<ViewPostingScreen> {
                   ),
                   Center(
                     child: Padding(
-                      padding: const EdgeInsets.only(top: 2.0, bottom: 8),
+                      padding: const EdgeInsets.only(top: 10.0, bottom: 35),
                       child: Text(
                         posting!.getFullAddress(),
                         style: const TextStyle(
-                          fontSize: 15,
+                          fontSize: 18,
                         ),
                       ),
                     ),

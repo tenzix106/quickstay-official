@@ -83,18 +83,15 @@ class UserViewModel {
   login(email, password) async {
     Get.snackbar("Please wait", "checking your credentials...");
     try {
-
       var adminSnapshot = await FirebaseFirestore.instance
-      .collection('admins')
-      .where('email', isEqualTo: email).get();
+          .collection('admins')
+          .where('email', isEqualTo: email)
+          .get();
 
-      if(adminSnapshot.docs.isNotEmpty)
-      {
-        await FirebaseAuth.instance.signInWithEmailAndPassword(
-          email: email, 
-          password: password
-        ).then((result) async
-        {
+      if (adminSnapshot.docs.isNotEmpty) {
+        await FirebaseAuth.instance
+            .signInWithEmailAndPassword(email: email, password: password)
+            .then((result) async {
           String currentUserID = result.user!.uid;
           AppConstants.currentUser.id = currentUserID;
 
@@ -104,9 +101,7 @@ class UserViewModel {
           Get.snackbar("Logged in", "Welcome, Admin!");
           Get.to(AdminHomeScreen());
         });
-      } 
-      else
-      {
+      } else {
         FirebaseAuth.instance
             .signInWithEmailAndPassword(
           email: email,
@@ -119,14 +114,15 @@ class UserViewModel {
           await getUserInfoFromFirestore(currentUserID);
           await getImageFromStorage(currentUserID);
           await AppConstants.currentUser.getMyPostingFromFirestore();
+          await AppConstants.currentUser.getMySavedPostingsFromFireStore();
 
           Get.snackbar("Logged in", "you are logged in successfully.");
           Get.to(GuestHomeScreen());
         });
       }
-      } catch (e) {
-        Get.snackbar("Error: ", e.toString());
-      }
+    } catch (e) {
+      Get.snackbar("Error: ", e.toString());
+    }
   }
 
   getUserInfoFromFirestore(userID) async {

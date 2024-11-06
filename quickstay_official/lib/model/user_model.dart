@@ -88,7 +88,7 @@ class UserModel extends ContactModel {
   // getAdminPostingsFromFirestore() async
   // {
   //   QuerySnapshot allPostingsSnapshot = await FirebaseFirestore.instance.collection('postings').get();
-    
+
   //   for (var doc in allPostingsSnapshot.docs) {
   //     PostingModel posting = PostingModel(id: doc.id);
   //     // Optionally fetch additional data for each posting if needed
@@ -113,6 +113,20 @@ class UserModel extends ContactModel {
     }
   }
 
+  getMySavedPostingsFromFireStore() async {
+    List<String> savedPostingIDs =
+        List<String>.from(snapshot!["savedPostingIDs"]) ?? [];
+
+    for (String postingID in savedPostingIDs) {
+      PostingModel posting = PostingModel(id: postingID);
+
+      await posting.getPostingInfoFromFirestore();
+      await posting.getAllImagesFromStorage();
+
+      savedPostings!.add(posting);
+    }
+  }
+
   addSavedPosting(PostingModel posting) async {
     for (var savedPosting in savedPostings!) {
       if (savedPosting.id == posting.id) {
@@ -120,7 +134,9 @@ class UserModel extends ContactModel {
       }
     }
 
-    savedPostings!.add(posting);
+    if (!savedPostings!.contains(posting)) {
+      savedPostings!.add(posting);
+    }
 
     List<String> savedPostingIDs = [];
 

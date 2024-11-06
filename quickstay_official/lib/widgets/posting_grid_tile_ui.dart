@@ -50,19 +50,19 @@ class _PostingGridTileUiState extends State<PostingGridTileUi> {
                 ),
         ),
         Text(
-          "${posting!.type} - ${posting!.city} - ${posting!.country}",
-          maxLines: 2,
+          posting!.name!,
+          maxLines: 3,
           style: const TextStyle(
-            fontSize: 12,
+            fontSize: 14,
             fontWeight: FontWeight.bold,
           ),
         ),
         Text(
-          posting!.name!,
+          posting!.type!,
           maxLines: 1,
           style: const TextStyle(
             fontSize: 12,
-            fontWeight: FontWeight.w200,
+            fontWeight: FontWeight.bold,
           ),
         ),
         Text(
@@ -76,7 +76,7 @@ class _PostingGridTileUiState extends State<PostingGridTileUi> {
         Row(
           children: [
             RatingBar.readOnly(
-              size: 28.0,
+              size: 22.0,
               maxRating: 5,
               initialRating: posting!.getCurrentRating(),
               filledIcon: Icons.star,

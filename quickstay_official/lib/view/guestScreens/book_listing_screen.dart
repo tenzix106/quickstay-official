@@ -28,6 +28,7 @@ class _BookListingScreenState extends State<BookListingScreen> {
   List<DateTime> bookedDates = [];
   List<DateTime> selectedDates = [];
   List<CalendarUI> calendarWidgets = [];
+  bool isPaymentInitiated = false;
 
   _buildCalendarWidgets() {
     for (int i = 0; i < 12; i++) {
@@ -97,6 +98,15 @@ class _BookListingScreenState extends State<BookListingScreen> {
   }
 
   @override
+  void dispose() {
+    // reset the states when the page is exited
+    isPaymentInitiated = false;
+    bookingPrice = 0.0;
+    paymentResult = "";
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
@@ -104,8 +114,8 @@ class _BookListingScreenState extends State<BookListingScreen> {
           decoration: const BoxDecoration(
             gradient: LinearGradient(
               colors: [
-                Colors.pinkAccent,
-                Colors.amber,
+                Color.fromARGB(255, 76, 215, 208),
+                Color.fromARGB(255, 164, 232, 224),
               ],
               begin: FractionalOffset(0.0, 0.0),
               end: FractionalOffset(1.0, 0.0),
@@ -118,7 +128,7 @@ class _BookListingScreenState extends State<BookListingScreen> {
           "Book ${posting!.name}",
           style: const TextStyle(
             color: Colors.white,
-            fontSize: 13,
+            fontSize: 16,
           ),
         ),
       ),
@@ -147,14 +157,21 @@ class _BookListingScreenState extends State<BookListingScreen> {
                   : PageView.builder(
                       itemCount: calendarWidgets.length,
                       itemBuilder: (context, index) {
-                        return calendarWidgets[index];
+                        return AbsorbPointer(
+                          absorbing: isPaymentInitiated,
+                          child: calendarWidgets[index],
+                        );
                       },
                     ),
             ),
             bookingPrice == 0.0
                 ? MaterialButton(
                     onPressed: () {
-                      calculateTotalAmount();
+                      setState(() {
+                        calculateTotalAmount(); // refresh the UI after clicking on proceed button to display Apple / Google Pay Option
+                        isPaymentInitiated =
+                            true; // temporarily disable data selection
+                      });
                     },
                     minWidth: double.infinity,
                     height: MediaQuery.of(context).size.height / 14,
@@ -207,6 +224,7 @@ class _BookListingScreenState extends State<BookListingScreen> {
 
                           setState(() {
                             paymentResult = result.toString();
+                            isPaymentInitiated = false;
                           });
 
                           _makeBooking;
@@ -233,6 +251,7 @@ class _BookListingScreenState extends State<BookListingScreen> {
 
                           setState(() {
                             paymentResult = result.toString();
+                            isPaymentInitiated = false;
                           });
 
                           _makeBooking();

@@ -69,13 +69,12 @@ class PostingModel {
     getPostingInfoFromSnapshot(snapshot);
   }
 
-  getAllPostingInfoFromFirestore() async{
+  getAllPostingInfoFromFirestore() async {
     List<PostingModel> allPostings = [];
 
     // Fetch unverified postings from Firestore
-    final querySnapshot = await FirebaseFirestore.instance
-        .collection('postings')
-        .get();
+    final querySnapshot =
+        await FirebaseFirestore.instance.collection('postings').get();
 
     // Map each document snapshot to a PostingModel
     for (var doc in querySnapshot.docs) {
@@ -87,7 +86,6 @@ class PostingModel {
 
     return allPostings;
   }
-  
 
   getUnverifiedPostingsFromFirestore() async {
     List<PostingModel> unverifiedPostings = [];
@@ -108,6 +106,7 @@ class PostingModel {
 
     return unverifiedPostings;
   }
+
   getUnverifiedPostingInfoFromSnapshot(DocumentSnapshot snapshot) {
     address = snapshot['address'] ?? "";
     amenities = List<String>.from(snapshot['amenities'] ?? []);
@@ -116,7 +115,7 @@ class PostingModel {
     city = snapshot['city'] ?? "";
     country = snapshot['country'] ?? "";
     description = snapshot['description'] ?? "";
-    
+
     String hostID = snapshot['hostId'] ?? "";
     host = ContactModel(id: hostID);
 
@@ -129,8 +128,7 @@ class PostingModel {
     verified = snapshot['verified'] ?? false;
   }
 
-  getUnverifiedPostings() async
-  {}
+  getUnverifiedPostings() async {}
 
   getPostingInfoFromSnapshot(DocumentSnapshot snapshot) {
     address = snapshot['address'] ?? "";
