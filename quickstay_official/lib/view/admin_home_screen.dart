@@ -51,44 +51,6 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
     );
   }
 
-  @override
-  void initState() {
-    // TODO: implement initState
-    super.initState();
-    fetchUnverifiedPostings();
-  }
-
-  Future<void> fetchUnverifiedPostings() async {
-    final snapshot = await FirebaseFirestore.instance
-        .collection('postings')
-        .where('verified', isEqualTo: false)
-        .get();
-
-    setState(() {
-      unverifiedPostings = snapshot.docs.map((doc) {
-        PostingModel posting = PostingModel(id: doc.id);
-        posting.getPostingInfoFromSnapshot(doc);
-        return posting;
-      }).toList();
-    });
-
-    Get.snackbar("Posting Verified", "The posting has been verified!");
-  }
-
-  Future<void> verifyPosting(PostingModel posting) async {
-    await FirebaseFirestore.instance
-        .collection('postings')
-        .doc(posting.id)
-        .update({'verified': true});
-
-    setState(() {
-      unverifiedPostings.remove(posting);
-    });
-
-    Get.snackbar(
-        "Posting Verified", "The posting has been verified successfully.");
-  }
-
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(

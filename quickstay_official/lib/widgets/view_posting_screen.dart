@@ -148,7 +148,7 @@ class _ViewPostingScreenState extends State<ViewPostingScreen> {
                     children: <Widget>[
                       // posting name
                       SizedBox(
-                        width: MediaQuery.of(context).size.width / 1.55,
+                        width: MediaQuery.of(context).size.width / 2,
                         child: Text(
                           posting!.name!.toUpperCase(),
                           style: const TextStyle(

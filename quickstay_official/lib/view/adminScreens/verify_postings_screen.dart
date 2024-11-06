@@ -10,6 +10,8 @@ import 'package:quickstay_official/global.dart';
 import 'package:quickstay_official/model/app_constants.dart';
 import 'package:quickstay_official/model/posting_model.dart';
 import 'package:quickstay_official/view/adminScreens/all_postings_screen.dart';
+import 'package:quickstay_official/view/adminScreens/posting_verification_screen.dart';
+import 'package:quickstay_official/view/admin_home_screen.dart';
 import 'package:quickstay_official/view/guest_home_screen.dart';
 import 'package:quickstay_official/view/host_home_screen.dart';
 import 'package:quickstay_official/widgets/amenities_ui.dart';
@@ -88,7 +90,7 @@ class _VerifyPostingsScreenState extends State<VerifyPostingsScreen> {
 
     Get.snackbar(
         "Posting Verified", "The posting has been verified successfully.");
-    Get.to(AllPostingsScreen());
+    Get.to(AdminHomeScreen());
   }
 
   Future<List<MemoryImage>> getImagesFromStorage(PostingModel posting) async {
