@@ -7,7 +7,7 @@ import 'package:quickstay_official/model/app_constants.dart';
 import 'package:quickstay_official/view/hostScreens/create_postings_screen.dart';
 import 'package:quickstay_official/widgets/posting_list_tile_button.dart';
 import 'package:quickstay_official/widgets/posting_list_tile_ui.dart';
-import 'package:quickstay_official/model/posting_model.dart'; 
+import 'package:quickstay_official/model/posting_model.dart';
 
 class AllPostingsScreen extends StatefulWidget {
   const AllPostingsScreen({super.key});
@@ -31,10 +31,10 @@ class AllPostingsScreenState extends State<AllPostingsScreen> {
 
   Future<void> fetchAllPostings() async {
     PostingModel postingModel = PostingModel();
-    
+
     // Fetch unverified postings from Firestore
     allPostings = await postingModel.getAllPostingInfoFromFirestore();
-    
+
     // Initialize displayImages list
     displayImages = [];
 
@@ -49,6 +49,7 @@ class AllPostingsScreenState extends State<AllPostingsScreen> {
       isLoading = false; // Update loading state
     });
   }
+
   getImagesFromStorage(PostingModel posting) async {
     List<MemoryImage> displayImages = [];
 
@@ -69,39 +70,44 @@ class AllPostingsScreenState extends State<AllPostingsScreen> {
         }
       }
     }
-    
+
     return displayImages; // Return the list of MemoryImages
   }
+
   @override
   Widget build(BuildContext context) {
-  return Padding(
-    padding: const EdgeInsets.only(top: 25),
-    child: isLoading
-        ? Center(child: CircularProgressIndicator()) // Show loading indicator
-        : ListView.builder(
-            itemCount: allPostings.length, // Set itemCount to allPostings.length
-            itemBuilder: (context, index) {
-              return Padding(
-                padding: const EdgeInsets.fromLTRB(26, 0, 26, 26),
-                child: InkResponse(
-                  onTap: () {
-                    Get.to(CreatePostingsScreen(
-                      posting: allPostings[index], // Directly access the posting
-                    ));
-                  },
-                  child: Container(
-                    decoration: BoxDecoration(
-                      border: Border.all(
-                        color: Colors.grey,
-                        width: 1.2,
+    return Padding(
+      padding: const EdgeInsets.only(top: 25),
+      child: isLoading
+          ? Center(child: CircularProgressIndicator()) // Show loading indicator
+          : ListView.builder(
+              itemCount:
+                  allPostings.length, // Set itemCount to allPostings.length
+              itemBuilder: (context, index) {
+                return Padding(
+                  padding: const EdgeInsets.fromLTRB(26, 0, 26, 26),
+                  child: InkResponse(
+                    onTap: () {
+                      Get.to(CreatePostingsScreen(
+                        posting:
+                            allPostings[index], // Directly access the posting
+                      ));
+                    },
+                    child: Container(
+                      decoration: BoxDecoration(
+                        border: Border.all(
+                          color: Colors.grey,
+                          width: 1.2,
+                        ),
                       ),
+                      child: PostingListTileUi(
+                          posting: allPostings[
+                              index]), // Only display PostingListTileUi
                     ),
-                    child: PostingListTileUi(posting: allPostings[index]), // Only display PostingListTileUi
                   ),
-                ),
-              );
-            },
-          ),
-  );
-}
+                );
+              },
+            ),
+    );
+  }
 }

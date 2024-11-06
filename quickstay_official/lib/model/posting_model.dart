@@ -310,4 +310,14 @@ class PostingModel {
 
     Get.snackbar("Listing", "Booked Successfully!");
   }
+
+  factory PostingModel.fromFirestore(DocumentSnapshot doc) {
+    final data = doc.data() as Map<String, dynamic>;
+    return PostingModel(
+      id: doc.id,
+      name: data['name'] ?? '',
+      city: data['city'],
+      type: data['type'],
+    );
+  }
 }

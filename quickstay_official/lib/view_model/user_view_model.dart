@@ -95,6 +95,8 @@ class UserViewModel {
           String currentUserID = result.user!.uid;
           AppConstants.currentUser.id = currentUserID;
 
+          AppConstants.currentUser = UserModel();
+
           await getUserInfoFromFirestore(currentUserID);
           await getImageFromStorage(currentUserID);
 
@@ -110,6 +112,8 @@ class UserViewModel {
             .then((result) async {
           String currentUserID = result.user!.uid;
           AppConstants.currentUser.id = currentUserID;
+
+          AppConstants.currentUser = UserModel();
 
           await getUserInfoFromFirestore(currentUserID);
           await getImageFromStorage(currentUserID);

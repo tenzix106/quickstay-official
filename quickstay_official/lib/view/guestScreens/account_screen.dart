@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:quickstay_official/global.dart';
 import 'package:quickstay_official/model/app_constants.dart';
+import 'package:quickstay_official/model/user_model.dart';
 import 'package:quickstay_official/view/guest_home_screen.dart';
 import 'package:quickstay_official/view/host_home_screen.dart';
 import 'package:quickstay_official/view/login_screen.dart';
@@ -49,6 +50,7 @@ class AccountScreenState extends State<AccountScreen> {
   }
 
   void _logout() async {
+    AppConstants.currentUser = UserModel();
     await FirebaseAuth.instance.signOut();
     Get.offAll(LoginScreen()); // Navigate to guest home screen
   }
@@ -121,7 +123,9 @@ class AccountScreenState extends State<AccountScreen> {
                     onTap: () {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => const PersonalInformatioScreen()),
+                        MaterialPageRoute(
+                            builder: (context) =>
+                                const PersonalInformatioScreen()),
                       );
                     },
                   ),

@@ -16,23 +16,53 @@ class ExploreScreen extends StatefulWidget {
 
 class _ExploreScreenState extends State<ExploreScreen> {
   TextEditingController controllerSearch = TextEditingController();
-  Stream stream = FirebaseFirestore.instance.collection('postings')
-  .where('verified', isEqualTo: true)
-  .snapshots();
+  Stream<QuerySnapshot>? stream;
   String searchType = "";
 
   bool isNameButtonSelected = false;
   bool isCityButtonSelected = false;
   bool isTypeButtonSelected = false;
 
-  searchByField() {}
+  @override
+  void initState() {
+    super.initState();
 
-  pressSearchByButton(String searchTypeStr, bool isNameButtonSelectedB,
+    // load all postings first
+    stream = FirebaseFirestore.instance
+        .collection('postings')
+        .where('verified', isEqualTo: true)
+        .snapshots();
+  }
+
+  void searchByField() {
+    String queryText = controllerSearch.text.trim();
+
+    if (queryText.isNotEmpty && searchType.isNotEmpty) {
+      setState(() {
+        stream = FirebaseFirestore.instance
+            .collection('postings')
+            .where('verified', isEqualTo: true)
+            .where(searchType, isEqualTo: queryText)
+            .snapshots();
+      });
+    } else {
+      setState(() {
+        stream = FirebaseFirestore.instance
+            .collection('postings')
+            .where('verified', isEqualTo: true)
+            .snapshots();
+      });
+    }
+  }
+
+  void pressSearchByButton(String searchTypeStr, bool isNameButtonSelectedB,
       bool isCityButtonSelectedB, bool isTypeButtonSelectedB) {
     searchType = searchTypeStr;
     isNameButtonSelected = isNameButtonSelectedB;
     isCityButtonSelected = isCityButtonSelectedB;
     isTypeButtonSelected = isTypeButtonSelectedB;
+
+    searchByField();
   }
 
   @override
@@ -65,7 +95,8 @@ class _ExploreScreenState extends State<ExploreScreen> {
               ),
             ),
 
-            // name - city - type - clear bin
+            // filter button
+            // name - city - type - clear
             SizedBox(
               height: 48,
               width: MediaQuery.of(context).size.width / .5,
@@ -93,7 +124,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(20)),
                     color:
-                        isNameButtonSelected ? Colors.pinkAccent : Colors.white,
+                        isCityButtonSelected ? Colors.pinkAccent : Colors.white,
                     child: const Text("City"),
                   ),
                   const SizedBox(
@@ -106,7 +137,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(20)),
                     color:
-                        isNameButtonSelected ? Colors.pinkAccent : Colors.white,
+                        isTypeButtonSelected ? Colors.pinkAccent : Colors.white,
                     child: const Text("Type"),
                   ),
                   const SizedBox(
@@ -118,8 +149,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
                     },
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(20)),
-                    color:
-                        isNameButtonSelected ? Colors.pinkAccent : Colors.white,
+                    color: Colors.white,
                     child: const Text("Clear"),
                   ),
                 ],
@@ -127,14 +157,14 @@ class _ExploreScreenState extends State<ExploreScreen> {
             ),
 
             // display listings
-            StreamBuilder(
+            StreamBuilder<QuerySnapshot>(
                 stream: stream,
                 builder: (context, dataSnapshots) {
                   if (dataSnapshots.hasData) {
                     return GridView.builder(
                       physics: const ScrollPhysics(),
                       shrinkWrap: true,
-                      itemCount: dataSnapshots.data.docs.length,
+                      itemCount: dataSnapshots.data!.docs.length,
                       gridDelegate:
                           const SliverGridDelegateWithFixedCrossAxisCount(
                         crossAxisCount: 2,
@@ -144,7 +174,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
                       ),
                       itemBuilder: (context, index) {
                         DocumentSnapshot snapshot =
-                            dataSnapshots.data.docs[index];
+                            dataSnapshots.data!.docs[index];
 
                         PostingModel cPosting = PostingModel(id: snapshot.id);
 
