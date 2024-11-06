@@ -3,54 +3,22 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:quickstay_official/global.dart';
 import 'package:quickstay_official/model/app_constants.dart';
+import 'package:quickstay_official/view/adminScreens/admin_personal_information_screen.dart';
 import 'package:quickstay_official/view/guest_home_screen.dart';
 import 'package:quickstay_official/view/host_home_screen.dart';
 import 'package:quickstay_official/view/login_screen.dart';
-import 'package:quickstay_official/view/personal_information_screen.dart';
 
-class AccountScreen extends StatefulWidget {
-  const AccountScreen({super.key});
+class AdminAccountScreen extends StatefulWidget {
+  const AdminAccountScreen({super.key});
 
   @override
-  State<AccountScreen> createState() => AccountScreenState();
+  State<AdminAccountScreen> createState() => AdminAccountScreenState();
 }
 
-class AccountScreenState extends State<AccountScreen> {
-  String _hostingTitle = 'Show my Host Dashboard';
-
+class AdminAccountScreenState extends State<AdminAccountScreen> {
   @override
   void initState() {
     super.initState();
-    _updateHostingTitle();
-  }
-
-  void _updateHostingTitle() {
-    if (AppConstants.currentUser.isHost!) {
-      _hostingTitle = AppConstants.currentUser.isCurrentlyHosting!
-          ? 'Show my Guest Dashboard'
-          : 'Show my Host Dashboard';
-    } else {
-      _hostingTitle = "Become a host";
-    }
-  }
-
-  void modifyHostingMode() async {
-    if (AppConstants.currentUser.isHost!) {
-      AppConstants.currentUser.isCurrentlyHosting =
-          !AppConstants.currentUser.isCurrentlyHosting!;
-      Get.to(AppConstants.currentUser.isCurrentlyHosting!
-          ? HostHomeScreen()
-          : GuestHomeScreen());
-    } else {
-      await userViewModel.becomeHost(FirebaseAuth.instance.currentUser!.uid);
-      AppConstants.currentUser.isCurrentlyHosting = true;
-      Get.to(HostHomeScreen());
-    }
-  }
-
-  void _logout() async {
-    await FirebaseAuth.instance.signOut();
-    Get.offAll(LoginScreen()); // Navigate to guest home screen
   }
 
   @override
@@ -58,7 +26,7 @@ class AccountScreenState extends State<AccountScreen> {
     return Scaffold(
       body: SingleChildScrollView(
         child: Padding(
-          padding: const EdgeInsets.fromLTRB(25, 50, 20, 0),
+          padding: const EdgeInsets.fromLTRB(25, 20, 25, 0),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -69,15 +37,14 @@ class AccountScreenState extends State<AccountScreen> {
                 child: Center(
                   child: Column(
                     children: [
-                      // Profile Image
+                      // Image
                       MaterialButton(
                         onPressed: () {},
                         child: CircleAvatar(
                           backgroundColor: Colors.black,
                           radius: MediaQuery.of(context).size.width / 4.5,
                           child: CircleAvatar(
-                            backgroundImage:
-                                AppConstants.currentUser.displayImage,
+                            backgroundImage: AppConstants.currentUser .displayImage,
                             radius: MediaQuery.of(context).size.width / 4.6,
                           ),
                         ),
@@ -89,20 +56,31 @@ class AccountScreenState extends State<AccountScreen> {
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
                           Text(
-                            AppConstants.currentUser.getFullNameOfUser(),
+                            AppConstants.currentUser .getFullNameOfUser (),
                             style: const TextStyle(
                               fontWeight: FontWeight.bold,
                               fontSize: 24,
+                              color: Colors.black,
                             ),
                           ),
+                          const SizedBox(height: 5),
                           Text(
-                            AppConstants.currentUser.email.toString(),
+                            AppConstants.currentUser .email.toString(),
                             style: const TextStyle(
                               fontWeight: FontWeight.w400,
                               fontSize: 16,
                               color: Colors.grey,
                             ),
                           ),
+                          const SizedBox(height: 10),
+                          Text(
+                            AppConstants.currentUser.bio.toString(),
+                            style: const TextStyle(
+                              fontWeight: FontWeight.w400,
+                              fontSize: 16,
+                              color: Colors.grey,
+                            ),
+                          )
                         ],
                       )
                     ],
@@ -121,30 +99,23 @@ class AccountScreenState extends State<AccountScreen> {
                     onTap: () {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => const PersonalInformatioScreen()),
+                        MaterialPageRoute(builder: (context) => const AdminPersonalInformationScreen()),
                       );
-                    },
-                  ),
-                  const SizedBox(height: 10),
-                  _buildOptionTile(
-                    title: _hostingTitle,
-                    icon: Icons.hotel_outlined,
-                    onTap: () {
-                      modifyHostingMode();
-                      setState(() {
-                        _updateHostingTitle();
-                      });
                     },
                   ),
                   const SizedBox(height: 10),
                   _buildOptionTile(
                     title: "Log Out",
                     icon: Icons.login_outlined,
-                    onTap: _logout,
+                    onTap: () {
+                      // Handle log out
+                      FirebaseAuth.instance.signOut();
+                      Get.offAll(LoginScreen()); // Navigate to guest home screen
+                    },
                   ),
                   const SizedBox(height: 20),
                 ],
-              ),
+              )
             ],
           ),
         ),
@@ -152,10 +123,7 @@ class AccountScreenState extends State<AccountScreen> {
     );
   }
 
-  Widget _buildOptionTile(
-      {required String title,
-      required IconData icon,
-      required VoidCallback onTap}) {
+  Widget _buildOptionTile({required String title, required IconData icon, required VoidCallback onTap}) {
     return Container(
       decoration: BoxDecoration(
         color: Color.fromRGBO(76, 215, 208, 0.8),

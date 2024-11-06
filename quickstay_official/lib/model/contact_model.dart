@@ -8,6 +8,9 @@ class ContactModel {
   String? firstName;
   String? lastName;
   String? fullName;
+  String? city;
+  String? country;
+  String? location;
   MemoryImage? displayImage;
 
   ContactModel({
@@ -21,11 +24,18 @@ class ContactModel {
     return fullName = firstName! + " " + lastName!;
   }
 
+  String getLocationOfUser()
+  {
+    return location = city! + ", " + country!;
+  }
+
   UserModel createUserFromContact() {
     return UserModel(
       id: id!,
       firstName: firstName!,
       lastName: lastName!,
+      city: city!,
+      country: country!,
       displayImage: displayImage!,
     );
   }

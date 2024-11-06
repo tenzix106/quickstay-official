@@ -69,7 +69,27 @@ class PostingModel {
     getPostingInfoFromSnapshot(snapshot);
   }
 
-  Future<List<PostingModel>> getUnverifiedPostingsFromFirestore() async {
+  getAllPostingInfoFromFirestore() async{
+    List<PostingModel> allPostings = [];
+
+    // Fetch unverified postings from Firestore
+    final querySnapshot = await FirebaseFirestore.instance
+        .collection('postings')
+        .get();
+
+    // Map each document snapshot to a PostingModel
+    for (var doc in querySnapshot.docs) {
+      PostingModel posting = PostingModel(id: doc.id);
+      posting.getUnverifiedPostingInfoFromSnapshot(doc);
+      posting.getAllImagesFromStorage();
+      allPostings.add(posting);
+    }
+
+    return allPostings;
+  }
+  
+
+  getUnverifiedPostingsFromFirestore() async {
     List<PostingModel> unverifiedPostings = [];
 
     // Fetch unverified postings from Firestore
@@ -77,8 +97,6 @@ class PostingModel {
         .collection('postings')
         .where('verified', isEqualTo: false)
         .get();
-
-    print("Number of unverified postings: ${querySnapshot.docs.length}");
 
     // Map each document snapshot to a PostingModel
     for (var doc in querySnapshot.docs) {
@@ -92,7 +110,6 @@ class PostingModel {
   }
   getUnverifiedPostingInfoFromSnapshot(DocumentSnapshot snapshot) {
     address = snapshot['address'] ?? "";
-    print(address);
     amenities = List<String>.from(snapshot['amenities'] ?? []);
     bathrooms = Map<String, int>.from(snapshot['bathrooms'] ?? {});
     beds = Map<String, int>.from(snapshot['beds'] ?? {});

@@ -2,7 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:quickstay_official/model/posting_model.dart';
+import 'package:quickstay_official/view/adminScreens/posting_verification_screen.dart';
+import 'package:quickstay_official/view/adminScreens/users_screen.dart';
 import 'package:quickstay_official/view/adminScreens/verify_postings_screen.dart';
+import 'package:quickstay_official/view/adminScreens/all_postings_screen.dart';
+import 'package:quickstay_official/view/admin_account_screen.dart';
 import 'package:quickstay_official/view/guestScreens/account_screen.dart';
 import 'package:quickstay_official/widgets/posting_list_tile_ui.dart';
 
@@ -26,10 +30,10 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
   ];
 
   final List<Widget> screens = [
-    VerifyPostingsScreen(),
-    // UsersScreen(),
-    // PostingsScreen(),
-    AccountScreen(),
+    PostingVerificationScreen(),
+    UsersScreen(),
+    AllPostingsScreen(),
+    AdminAccountScreen(),
   ];
 
   BottomNavigationBarItem customNavigationBarItem(int index, IconData iconData, String title)
@@ -116,10 +120,10 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
           type: BottomNavigationBarType.fixed,
           items: <BottomNavigationBarItem>
           [
-            customNavigationBarItem(0, Icons.search, screenTitles[0]),
-            customNavigationBarItem(1, Icons.favorite_border, screenTitles[1]),
-            customNavigationBarItem(2, Icons.hotel, screenTitles[2]),
-            customNavigationBarItem(3, Icons.message, screenTitles[3]),
+            customNavigationBarItem(0, Icons.verified_outlined, screenTitles[0]),
+            customNavigationBarItem(1, Icons.supervised_user_circle_outlined, screenTitles[1]),
+            customNavigationBarItem(2, Icons.list, screenTitles[2]),
+            customNavigationBarItem(3, Icons.person_outlined, screenTitles[3]),
           ]
       ),
     );
