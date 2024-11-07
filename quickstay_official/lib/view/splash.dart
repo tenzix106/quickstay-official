@@ -27,23 +27,14 @@ class _SplashScreenState extends State<SplashScreen> {
     return Scaffold(
       body: Container(
         decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            colors: [
-              Colors.blueAccent,
-              Colors.orange,
-            ],
-            begin:FractionalOffset(0, 1),
-            end: FractionalOffset(1, 0),
-            stops: [0,1],
-            tileMode: TileMode.clamp,
-          )
+          color: Color.fromRGBO(76, 215, 208, 100),
         ),
         child: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Image.asset(
-                "assets/images/splash.png"
+                "assets/images/quickstay_logo.png"
               ),
 
               Padding(

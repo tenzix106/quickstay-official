@@ -84,6 +84,13 @@ class _VerifyPostingsScreenState extends State<VerifyPostingsScreen> {
         .doc(posting.id)
         .update({'verified': true});
 
+    int index = AppConstants.currentUser.myPostings!.indexWhere((p) => p.id == posting.id);
+
+    if(index != -1)
+    {
+      AppConstants.currentUser.myPostings![index] = posting;
+    }
+
     setState(() {
       unverifiedPostings.remove(posting);
     });
