@@ -58,9 +58,8 @@ class PostingViewModel {
         .update(dataMap);
   }
 
-  deletePostingInfoFromFirestore(String postingId) async
-  {
-      try {
+  deletePostingInfoFromFirestore(String postingId) async {
+    try {
       await FirebaseFirestore.instance
           .collection('postings')
           .doc(postingId)
