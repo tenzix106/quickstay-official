@@ -50,7 +50,7 @@ class AccountScreenState extends State<AccountScreen> {
   }
 
   void _logout() async {
-    AppConstants.currentUser = UserModel();
+    //AppConstants.currentUser = UserModel();
     await FirebaseAuth.instance.signOut();
     Get.offAll(LoginScreen()); // Navigate to guest home screen
   }

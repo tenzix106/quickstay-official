@@ -93,9 +93,9 @@ class UserViewModel {
             .signInWithEmailAndPassword(email: email, password: password)
             .then((result) async {
           String currentUserID = result.user!.uid;
-          AppConstants.currentUser.id = currentUserID;
 
           AppConstants.currentUser = UserModel();
+          AppConstants.currentUser.id = currentUserID;
 
           await getUserInfoFromFirestore(currentUserID);
           await getImageFromStorage(currentUserID);
@@ -111,9 +111,9 @@ class UserViewModel {
         )
             .then((result) async {
           String currentUserID = result.user!.uid;
-          AppConstants.currentUser.id = currentUserID;
 
           AppConstants.currentUser = UserModel();
+          AppConstants.currentUser.id = currentUserID;
 
           await getUserInfoFromFirestore(currentUserID);
           await getImageFromStorage(currentUserID);

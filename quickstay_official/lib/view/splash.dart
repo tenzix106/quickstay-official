@@ -15,43 +15,33 @@ class _SplashScreenState extends State<SplashScreen> {
   void initState() {
     super.initState();
 
-    Timer(const Duration(seconds: 2), (){
+    Timer(const Duration(seconds: 2), () {
       Get.to(LoginScreen());
-    }) ;
-    
+    });
   }
-  @override
 
-  
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
-        decoration: const BoxDecoration(
-          color: Color.fromRGBO(76, 215, 208, 100),
-        ),
-        child: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Image.asset(
-                "assets/images/quickstay_logo.png"
-              ),
-
-              Padding(
-                padding:const EdgeInsets.only(top:18),
-                child: Text(
-                    "Welcome to QuickStay!",
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 28,
-                      color: Colors.white,
-                    )
-                  )
-                )
-            ],
-          ))
-      )
-    );
+        body: Container(
+            decoration: const BoxDecoration(
+              color: Color.fromRGBO(76, 215, 208, 100),
+            ),
+            child: Center(
+                child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Image.asset("assets/images/quickstay_logo.png"),
+                Padding(
+                    padding: const EdgeInsets.only(top: 18),
+                    child: Text("Welcome to QuickStay!",
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 28,
+                          color: Colors.white,
+                        )))
+              ],
+            ))));
   }
 }

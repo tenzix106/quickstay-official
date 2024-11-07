@@ -121,7 +121,8 @@ class _CreatePostingsScreenState extends State<CreatePostingsScreen> {
         builder: (BuildContext context) {
           return AlertDialog(
             title: const Text("Delete Listing"),
-            content: const Text("Are you sure you want to delete this listing?"),
+            content:
+                const Text("Are you sure you want to delete this listing?"),
             actions: <Widget>[
               TextButton(
                 onPressed: () => Navigator.of(context).pop(false),
@@ -150,7 +151,8 @@ class _CreatePostingsScreenState extends State<CreatePostingsScreen> {
           // Refresh the UI
           setState(() {});
 
-          Get.snackbar("Delete Listing", "Your Listing has been deleted successfully!");
+          Get.snackbar(
+              "Delete Listing", "Your Listing has been deleted successfully!");
           Get.to(HostHomeScreen());
         } catch (e) {
           // Handle any errors that occur during deletion
@@ -159,23 +161,27 @@ class _CreatePostingsScreenState extends State<CreatePostingsScreen> {
       }
     }
   }
-    Future<void> removePostingFromMyPostings(PostingModel posting) async {
+
+  Future<void> removePostingFromMyPostings(PostingModel posting) async {
     // Check if the posting exists in the local myPostings list
-    if (AppConstants.currentUser .myPostings!.contains(posting)) {
+    if (AppConstants.currentUser.myPostings!.contains(posting)) {
       // Remove the posting from the local list
-      AppConstants.currentUser .myPostings!.remove(posting);
+      AppConstants.currentUser.myPostings!.remove(posting);
 
       // Create a list to hold the updated posting IDs
       List<String> myPostingIDsList = [];
 
       // Populate the list with the remaining posting IDs
-      AppConstants.currentUser .myPostings!.forEach((element) {
+      AppConstants.currentUser.myPostings!.forEach((element) {
         myPostingIDsList.add(element.id!);
       });
 
       try {
         // Update the user's myPostingIDs field in Firestore
-        await FirebaseFirestore.instance.collection("users").doc(AppConstants.currentUser .id).update({
+        await FirebaseFirestore.instance
+            .collection("users")
+            .doc(AppConstants.currentUser.id)
+            .update({
           'myPostingIDs': myPostingIDsList,
         });
 
@@ -283,7 +289,8 @@ class _CreatePostingsScreenState extends State<CreatePostingsScreen> {
               },
               icon: const Icon(Icons.upload),
             ),
-            if (widget.posting != null) // Show delete button only if editing an existing posting
+            if (widget.posting !=
+                null) // Show delete button only if editing an existing posting
               IconButton(
                 onPressed: _deletePosting,
                 icon: const Icon(Icons.delete),
@@ -448,8 +455,8 @@ class _CreatePostingsScreenState extends State<CreatePostingsScreen> {
                           Padding(
                               padding: const EdgeInsets.only(top: 1.0),
                               child: TextFormField(
-                                decoration: const InputDecoration(
-                                    labelText: "Listing Name"),
+                                decoration:
+                                    const InputDecoration(labelText: "Country"),
                                 style: const TextStyle(
                                   fontSize: 25.0,
                                 ),
