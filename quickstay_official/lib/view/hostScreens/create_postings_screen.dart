@@ -7,6 +7,9 @@ import 'package:image_picker/image_picker.dart';
 import 'package:quickstay_official/global.dart';
 import 'package:quickstay_official/model/app_constants.dart';
 import 'package:quickstay_official/model/posting_model.dart';
+import 'package:quickstay_official/view/adminScreens/all_postings_screen.dart';
+import 'package:quickstay_official/view/adminScreens/verify_postings_screen.dart';
+import 'package:quickstay_official/view/admin_home_screen.dart';
 import 'package:quickstay_official/view/guest_home_screen.dart';
 import 'package:quickstay_official/view/host_home_screen.dart';
 import 'package:quickstay_official/widgets/amenities_ui.dart';
@@ -49,7 +52,7 @@ class _CreatePostingsScreenState extends State<CreatePostingsScreen> {
 
   List<MemoryImage>? _imagesList;
 
-  initializeValues() {
+  initializeValues(){
     if (widget.posting == null) {
       _nameTextEditingController = TextEditingController(text: "");
       _priceTextEditingController = TextEditingController(text: "");
@@ -114,6 +117,10 @@ class _CreatePostingsScreenState extends State<CreatePostingsScreen> {
   }
 
   Future<void> _deletePosting() async {
+    var adminSnapshot = await FirebaseFirestore.instance
+                    .collection('admins')
+                    .where('email', isEqualTo: AppConstants.currentUser.email)
+                    .get();
     if (widget.posting != null) {
       // Show a confirmation dialog before deleting
       bool? confirmDelete = await showDialog<bool>(
@@ -153,7 +160,13 @@ class _CreatePostingsScreenState extends State<CreatePostingsScreen> {
 
           Get.snackbar(
               "Delete Listing", "Your Listing has been deleted successfully!");
-          Get.to(HostHomeScreen());
+          if(adminSnapshot.docs.isNotEmpty)
+          {
+            Get.to(AdminHomeScreen());
+          }
+          else
+          {Get.to(HostHomeScreen());}
+          
         } catch (e) {
           // Handle any errors that occur during deletion
           Get.snackbar("Error", "Failed to delete the listing: $e");
@@ -220,6 +233,11 @@ class _CreatePostingsScreenState extends State<CreatePostingsScreen> {
           actions: [
             IconButton(
               onPressed: () async {
+                
+              var adminSnapshot = await FirebaseFirestore.instance
+                    .collection('admins')
+                    .where('email', isEqualTo: AppConstants.currentUser.email)
+                    .get();
                 if (!formKey.currentState!.validate()) {
                   return;
                 }
@@ -232,7 +250,9 @@ class _CreatePostingsScreenState extends State<CreatePostingsScreen> {
                   return;
                 }
 
-                postingModel.name = _nameTextEditingController.text;
+                if (adminSnapshot.docs.isNotEmpty)
+                {
+                  postingModel.name = _nameTextEditingController.text;
                 postingModel.price =
                     double.parse(_priceTextEditingController.text);
                 postingModel.description =
@@ -253,15 +273,7 @@ class _CreatePostingsScreenState extends State<CreatePostingsScreen> {
                 postingModel.setImagesName();
 
                 if (widget.posting == null) {
-                  postingModel.rating = 3.5;
-                  postingModel.bookings = [];
-                  postingModel.reviews = [];
-
-                  await postingViewModel.addListingInfoToFirestore();
-                  await postingViewModel.addImagesToFirebaseStorage();
-
-                  Get.snackbar("New Listing",
-                      "Your New Listing is Uploaded Successfully!");
+                  print("NULL");
                 } else {
                   postingModel.rating = widget.posting!.rating;
                   postingModel.bookings = widget.posting!.bookings;
@@ -281,11 +293,69 @@ class _CreatePostingsScreenState extends State<CreatePostingsScreen> {
                   await postingViewModel.updatePostingInfoToFirestore();
 
                   Get.snackbar("Update Listing",
-                      "Your Listing is Updated Successfully!");
+                      "Listing is Updated Successfully!");
                 }
 
                 postingModel = PostingModel();
-                Get.to(HostHomeScreen());
+                Get.to(AdminHomeScreen());
+                }
+                else
+                {
+                  postingModel.name = _nameTextEditingController.text;
+                  postingModel.price =
+                      double.parse(_priceTextEditingController.text);
+                  postingModel.description =
+                      _descriptionTextEditingController.text;
+                  postingModel.address = _addressTextEditingController.text;
+                  postingModel.city = _cityTextEditingController.text;
+                  postingModel.country = _countryTextEditingController.text;
+                  postingModel.amenities =
+                      _amenitiesTextEditingController.text.split(",");
+                  postingModel.type = residenceTypeSelected;
+                  postingModel.beds = _beds;
+                  postingModel.bathrooms = _bathrooms;
+                  postingModel.displayImages = _imagesList;
+
+                  postingModel.host =
+                      AppConstants.currentUser.createUserFromContact();
+
+                  postingModel.setImagesName();
+
+                  if (widget.posting == null) {
+                    postingModel.rating = 3.5;
+                    postingModel.bookings = [];
+                    postingModel.reviews = [];
+
+                    await postingViewModel.addListingInfoToFirestore();
+                    await postingViewModel.addImagesToFirebaseStorage();
+
+                    Get.snackbar("New Listing",
+                        "Your New Listing is Uploaded Successfully!");
+                  } else {
+                    postingModel.rating = widget.posting!.rating;
+                    postingModel.bookings = widget.posting!.bookings;
+                    postingModel.reviews = widget.posting!.reviews;
+                    postingModel.id = widget.posting!.id;
+
+                    for (int i = 0;
+                        i < AppConstants.currentUser.myPostings!.length;
+                        i++) {
+                      if (AppConstants.currentUser.myPostings![i].id ==
+                          postingModel.id) {
+                        AppConstants.currentUser.myPostings![i] = postingModel;
+                        break;
+                      }
+                    }
+
+                    await postingViewModel.updatePostingInfoToFirestore();
+
+                    Get.snackbar("Update Listing",
+                        "Your Listing is Updated Successfully!");
+                  }
+
+                  postingModel = PostingModel();
+                  Get.to(HostHomeScreen());
+                }
               },
               icon: const Icon(Icons.upload),
             ),

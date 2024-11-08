@@ -42,7 +42,16 @@ class _SignUpScreenState extends State<SignUpScreen> {
     ),
     body: Container(
       decoration: const BoxDecoration(
-            color: Color.fromRGBO(248, 234, 140, 100),
+            gradient: LinearGradient(
+            colors: [
+              Color.fromRGBO(76, 215, 208, 100),
+              Colors.amber,
+            ],
+            begin:FractionalOffset(1, 1),
+            end: FractionalOffset(0, 0),
+            stops: [0,1],
+            tileMode: TileMode.clamp,
+          )
           ),
       child: ListView(
         children: [

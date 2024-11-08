@@ -81,9 +81,14 @@ class UserModel extends ContactModel {
       myPostingIDsList.add(element.id!);
     });
 
-    await FirebaseFirestore.instance.collection("users").doc(id).update({
-      'myPostingIDs': myPostingIDsList,
-    });
+    // Check if id is valid
+      if (id == null || id!.isEmpty) {
+        throw Exception("User  ID is null or empty");
+      }
+
+      await FirebaseFirestore.instance.collection("users").doc(id).update({
+        'myPostingIDs': myPostingIDsList,
+      });
   }
   // getAdminPostingsFromFirestore() async
   // {

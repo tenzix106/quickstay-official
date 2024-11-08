@@ -89,7 +89,7 @@ class UserViewModel {
           .get();
 
       if (adminSnapshot.docs.isNotEmpty) {
-        await FirebaseAuth.instance
+        FirebaseAuth.instance
             .signInWithEmailAndPassword(email: email, password: password)
             .then((result) async {
           String currentUserID = result.user!.uid;

@@ -23,11 +23,11 @@ class _LoginScreenState extends State<LoginScreen> {
         decoration: const BoxDecoration(
           gradient: LinearGradient(
             colors: [
-              Colors.blueAccent,
+              Color.fromRGBO(76, 215, 208, 100),
               Colors.amber,
             ],
-            begin:FractionalOffset(0, 1),
-            end: FractionalOffset(1, 0),
+            begin:FractionalOffset(0, 0),
+            end: FractionalOffset(1, 1),
             stops: [0,1],
             tileMode: TileMode.clamp,
           )
@@ -35,7 +35,7 @@ class _LoginScreenState extends State<LoginScreen> {
         child: ListView(
           children: [
             Image.asset(
-              "assets/images/logo.png"
+              "assets/images/quickstay_logo.png"
             ),
             const Text(
               "Welcome to QuickStay!",
@@ -107,7 +107,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             }
                           },
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.blue,
+                            backgroundColor: Color.fromRGBO(1, 254, 225, 0.612),
                             padding: const EdgeInsets.symmetric(horizontal: 60)
                           ),
                           child: const Text(
@@ -126,9 +126,9 @@ class _LoginScreenState extends State<LoginScreen> {
                         Get.to(SignUpScreen());
                       },
                       child: Text(
-                        "Don't have an account? Sign up here",
+                        "Don't have an account? Sign up here!",
                         style: TextStyle(
-                          color: Colors.amber,
+                          color: Colors.white,
                           fontSize:18,
                           fontWeight: FontWeight.bold,
                         ),
