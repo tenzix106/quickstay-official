@@ -119,6 +119,7 @@ class UserViewModel {
           await getImageFromStorage(currentUserID);
           await AppConstants.currentUser.getMyPostingFromFirestore();
           await AppConstants.currentUser.getMySavedPostingsFromFireStore();
+          await AppConstants.currentUser.getAllBookings();
 
           Get.snackbar("Logged in", "you are logged in successfully.");
           Get.to(GuestHomeScreen());

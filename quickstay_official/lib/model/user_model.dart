@@ -230,4 +230,18 @@ class UserModel extends ContactModel {
 
     return allBookedDates;
   }
+
+  getAllBookings() async {
+    List<String> allBookings = [];
+
+    QuerySnapshot bookingSnapshot = await FirebaseFirestore.instance
+        .collection('users')
+        .doc(id)
+        .collection('bookings')
+        .get();
+
+    for (var booking in bookingSnapshot.docs) {
+      allBookings.add(booking.id);
+    }
+  }
 }

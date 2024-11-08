@@ -10,6 +10,8 @@ class BookingModel {
 
   BookingModel();
 
+  String? get postingID => null;
+
   getBookingInfoFromFirestoreFromPosting(
       PostingModel posting, DocumentSnapshot snapshot) async {
     posting = posting;
@@ -26,6 +28,18 @@ class BookingModel {
     _loadContactInfo(id, fullName);
 
     contact = ContactModel(id: contactID);
+  }
+
+  getBookingInfoFromFirestoreFromUser(
+      PostingModel posting, DocumentSnapshot snapshot) async {
+    this.posting = posting;
+    List<Timestamp> timestamps = List<Timestamp>.from(snapshot['dates']) ?? [];
+
+    dates = [];
+    timestamps.forEach((timestamp) {
+      dates!.add(timestamp.toDate());
+    });
+    print(this.posting?.name);
   }
 
   _loadContactInfo(String id, String fullName) {
