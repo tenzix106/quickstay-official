@@ -128,8 +128,6 @@ class PostingModel {
     verified = snapshot['verified'] ?? false;
   }
 
-  getUnverifiedPostings() async {}
-
   getPostingInfoFromSnapshot(DocumentSnapshot snapshot) {
     address = snapshot['address'] ?? "";
     amenities = List<String>.from(snapshot['amenities']) ?? [];
