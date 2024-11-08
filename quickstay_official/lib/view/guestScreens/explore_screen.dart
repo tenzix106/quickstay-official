@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -16,18 +18,63 @@ class ExploreScreen extends StatefulWidget {
 
 class _ExploreScreenState extends State<ExploreScreen> {
   TextEditingController controllerSearch = TextEditingController();
-
-  Stream stream = FirebaseFirestore.instance
-      .collection('postings')
-      .where('verified', isEqualTo: true)
-      .snapshots();
   String searchType = "";
+  Timer? _debounce;
+  Stream<QuerySnapshot>? _searchStream;
 
   bool isNameButtonSelected = false;
   bool isCityButtonSelected = false;
   bool isTypeButtonSelected = false;
 
-  searchByField() {}
+  @override
+  void initState() {
+    super.initState();
+    // Initialize the stream to show all verified postings
+    _searchStream = FirebaseFirestore.instance
+        .collection('postings')
+        .where('verified', isEqualTo: true)
+        .snapshots();
+  }
+
+  void _updateSearchStream() {
+    String searchText = controllerSearch.text.trim();
+    Query query = FirebaseFirestore.instance
+        .collection('postings')
+        .where('verified', isEqualTo: true);
+
+    if (searchText.isNotEmpty) {
+      switch (searchType) {
+        case "name":
+          query = query
+              .where('name', isGreaterThanOrEqualTo: searchText)
+              .where('name', isLessThanOrEqualTo: searchText + '\uf8ff');
+          break;
+        case "city":
+          query = query
+              .where('city', isGreaterThanOrEqualTo: searchText)
+              .where('city', isLessThanOrEqualTo: searchText + '\uf8ff');
+          break;
+        case "type":
+          query = query
+              .where('type', isGreaterThanOrEqualTo: searchText)
+              .where('type', isLessThanOrEqualTo: searchText + '\uf8ff');
+          break;
+      }
+    }
+
+    setState(() {
+      _searchStream = query.snapshots();
+    });
+  }
+
+  void searchByField() {
+    if (_debounce?.isActive ?? false) _debounce!.cancel();
+    _debounce = Timer(const Duration(milliseconds: 600), () {
+      setState(() {
+        _updateSearchStream();
+      }); // Trigger a rebuild to update the StreamBuilder
+    });
+  }
 
   pressSearchByButton(String searchTypeStr, bool isNameButtonSelectedB,
       bool isCityButtonSelectedB, bool isTypeButtonSelectedB) {
@@ -37,6 +84,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
       isCityButtonSelected = isCityButtonSelectedB;
       isTypeButtonSelected = isTypeButtonSelectedB;
     });
+    searchByField();
   }
 
   @override
@@ -65,7 +113,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
                   color: Colors.black,
                 ),
                 controller: controllerSearch,
-                onEditingComplete: searchByField,
+                onChanged: (value) => searchByField(),
               ),
             ),
 
@@ -122,6 +170,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
                   MaterialButton(
                     onPressed: () {
                       pressSearchByButton("", false, false, false);
+                      controllerSearch.clear();
                     },
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(10)),
@@ -138,13 +187,17 @@ class _ExploreScreenState extends State<ExploreScreen> {
 
             // display listings
             StreamBuilder(
-                stream: stream,
+                stream: _searchStream,
                 builder: (context, dataSnapshots) {
                   if (dataSnapshots.hasData) {
+                    // debugging statement to confirm search
+                    for (var doc in dataSnapshots.data!.docs) {
+                      print('Document ID: ${doc.id}, Data: ${doc.data()}');
+                    }
                     return GridView.builder(
                       physics: const ScrollPhysics(),
                       shrinkWrap: true,
-                      itemCount: dataSnapshots.data.docs.length,
+                      itemCount: dataSnapshots.data!.docs.length,
                       gridDelegate:
                           const SliverGridDelegateWithFixedCrossAxisCount(
                         crossAxisCount: 2,
@@ -154,32 +207,52 @@ class _ExploreScreenState extends State<ExploreScreen> {
                       ),
                       itemBuilder: (context, index) {
                         DocumentSnapshot snapshot =
-                            dataSnapshots.data.docs[index];
+                            dataSnapshots.data!.docs[index];
+
+                        print('Snapshot Found: ${snapshot.data()}');
 
                         PostingModel cPosting = PostingModel(id: snapshot.id);
 
                         cPosting.getPostingInfoFromSnapshot(snapshot);
 
+                        // Debugging: Print the posting being displayed
+                        print(
+                            'Displaying Posting: ${cPosting.name} with ID: ${cPosting.id}');
+
+                        // Debugging statement to check the title being displayed
+                        print(
+                            'Grid Item Title: ${cPosting.name}'); // Assuming 'name' is the title
+
+                        // debugging statement to check posting model
+                        print('PostingModel: ${cPosting.toString()}');
+
                         return InkResponse(
+                          enableFeedback: true,
+                          child: PostingGridTileUi(
+                            posting: cPosting,
+                          ),
                           onTap: () {
                             Get.to(ViewPostingScreen(
                               posting: cPosting,
                             ));
                           },
-                          enableFeedback: true,
-                          child: PostingGridTileUi(
-                            posting: cPosting,
-                          ),
                         );
                       },
                     );
                   } else {
-                    return const Center(child: CircularProgressIndicator());
+                    return const Center(child: Text('No Postings Found.'));
                   }
                 })
           ],
         ),
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    _debounce?.cancel();
+    controllerSearch.dispose();
+    super.dispose();
   }
 }

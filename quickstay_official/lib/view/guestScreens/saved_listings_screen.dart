@@ -22,7 +22,11 @@ class _SavedListingsScreenState extends State<SavedListingsScreen> {
   }
 
   void loadSavedListing() async {
+    //AppConstants.currentUser.savedPostings?.clear();
+
     await AppConstants.currentUser.getMySavedPostingsFromFireStore();
+
+    setState(() {});
   }
 
   @override

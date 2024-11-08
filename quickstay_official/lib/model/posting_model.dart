@@ -225,11 +225,11 @@ class PostingModel {
   String getBedroomText() {
     String text = "";
     if (beds!["small"] != 0) {
-      text += beds!["small"].toString() + " single/twin ";
+      text += beds!["small"].toString() + " single/twin \n";
     }
 
     if (beds!["medium"] != 0) {
-      text += beds!["medium"].toString() + " double ";
+      text += beds!["medium"].toString() + " double \n";
     }
 
     if (beds!["large"] != 0) {
@@ -242,7 +242,7 @@ class PostingModel {
   String getBathroomText() {
     String text = "";
     if (bathrooms!["full"] != 0) {
-      text += bathrooms!["full"].toString() + " full ";
+      text += bathrooms!["full"].toString() + " full \n";
     }
 
     if (bathrooms!["half"] != 0) {

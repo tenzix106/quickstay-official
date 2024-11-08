@@ -12,22 +12,22 @@ class PostingGridTileUi extends StatefulWidget {
 }
 
 class _PostingGridTileUiState extends State<PostingGridTileUi> {
-  PostingModel? posting;
-
-  updateUI() async {
-    await posting!.getFirstImageFromStorage();
-
-    setState(() {});
-  }
+  late PostingModel? posting;
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
 
-    posting = widget.posting;
+    posting = widget.posting!;
 
     updateUI();
+  }
+
+  Future<void> updateUI() async {
+    await posting!.getFirstImageFromStorage();
+
+    setState(() {});
   }
 
   @override
@@ -78,7 +78,7 @@ class _PostingGridTileUiState extends State<PostingGridTileUi> {
             RatingBar.readOnly(
               size: 22.0,
               maxRating: 5,
-              initialRating: posting!.getCurrentRating(),
+              initialRating: posting!.rating!,
               filledIcon: Icons.star,
               emptyIcon: Icons.star_border,
               filledColor: Colors.yellow,

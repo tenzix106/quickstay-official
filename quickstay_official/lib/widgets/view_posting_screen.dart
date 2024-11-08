@@ -198,7 +198,7 @@ class _ViewPostingScreenState extends State<ViewPostingScreen> {
 
                   // description - profile pic - name
                   Padding(
-                    padding: const EdgeInsets.only(top: 25.0, bottom: 35.0),
+                    padding: const EdgeInsets.only(top: 15.0, bottom: 35.0),
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -211,7 +211,7 @@ class _ViewPostingScreenState extends State<ViewPostingScreen> {
                             style: const TextStyle(
                               fontSize: 18,
                             ),
-                            maxLines: 6,
+                            maxLines: 10,
                           ),
                         ),
                         Column(
@@ -219,13 +219,12 @@ class _ViewPostingScreenState extends State<ViewPostingScreen> {
                             GestureDetector(
                               onTap: () {},
                               child: CircleAvatar(
-                                radius:
-                                    MediaQuery.of(context).size.width / 12.5,
+                                radius: MediaQuery.of(context).size.width / 10,
                                 backgroundColor: Colors.black,
                                 child: CircleAvatar(
                                   backgroundImage: posting!.host!.displayImage,
                                   radius:
-                                      MediaQuery.of(context).size.width / 13,
+                                      MediaQuery.of(context).size.width / 11,
                                 ),
                               ),
                             ),
@@ -246,7 +245,7 @@ class _ViewPostingScreenState extends State<ViewPostingScreen> {
 
                   // apartments - beds - bathrooms
                   Padding(
-                    padding: const EdgeInsets.only(bottom: 35.0),
+                    padding: const EdgeInsets.only(bottom: 15.0),
                     child: ListView(
                       shrinkWrap: true,
                       children: [
@@ -279,7 +278,7 @@ class _ViewPostingScreenState extends State<ViewPostingScreen> {
                   ),
 
                   Padding(
-                    padding: const EdgeInsets.only(top: 25.0, bottom: 25),
+                    padding: const EdgeInsets.only(top: 15.0, bottom: 25),
                     child: GridView.count(
                       shrinkWrap: true,
                       crossAxisCount: 2,
@@ -287,10 +286,24 @@ class _ViewPostingScreenState extends State<ViewPostingScreen> {
                       children:
                           List.generate(posting!.amenities!.length, (index) {
                         String currentAmenity = posting!.amenities![index];
-                        return Chip(
-                          label: Padding(
-                            padding:
-                                const EdgeInsets.symmetric(horizontal: 20.0),
+                        return Container(
+                          width: 150,
+                          height: 50,
+                          margin: const EdgeInsets.all(
+                              4.0), // Add some margin around the container
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 20.0,
+                              vertical: 10.0), // Padding inside the container
+                          decoration: BoxDecoration(
+                            color: Colors.white10, // Background color
+                            borderRadius:
+                                BorderRadius.circular(10.0), // Rounded corners
+                            border: Border.all(
+                                color: Colors.grey,
+                                width: 1), // Optional border
+                          ),
+                          child: Center(
+                            // Center the text inside the container
                             child: Text(
                               currentAmenity,
                               style: const TextStyle(
@@ -298,9 +311,10 @@ class _ViewPostingScreenState extends State<ViewPostingScreen> {
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,
                               ),
+                              textAlign: TextAlign
+                                  .center, // Center the text horizontally
                             ),
                           ),
-                          backgroundColor: Colors.white10,
                         );
                       }),
                     ),
