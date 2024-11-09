@@ -86,7 +86,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         obscureText: true,
                         validator: (valuePassword)
                         {
-                          if(valuePassword!.length < 5) {
+                          if(valuePassword!.length < 6) {
                             return "Password must be 6 or more characters.";
                           }
                           return null;
