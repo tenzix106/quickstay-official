@@ -38,19 +38,16 @@ class _TripsScreenState extends State<TripsScreen> {
       String postingID =
           booking['postingID']; // Adjust based on your Firestore structure
 
-      // Fetch the posting data using the postingID
-      DocumentSnapshot postingSnapshot = await FirebaseFirestore.instance
-          .collection('postings')
-          .doc(postingID)
-          .get();
+      PostingModel postingModel = PostingModel();
 
-      PostingModel postingModel = PostingModel.fromFirestore(postingSnapshot);
+      // Fetch the posting data using the new method
+      await postingModel.fetchAndPopulatePostingData(postingID);
 
       // Load booking info into the BookingModel
       await newBookingModel.getBookingInfoFromFirestoreFromUser(
           postingModel, booking);
 
-      print(newBookingModel.posting?.name);
+      print(postingModel.imageNames);
 
       // Add the populated BookingModel to the list
       allBookings.add(postingID);
@@ -64,39 +61,43 @@ class _TripsScreenState extends State<TripsScreen> {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(top: 25),
-      child: ListView.builder(
-        itemCount: allBookings.length + 1,
-        itemBuilder: (context, index) {
-          return Padding(
-            padding: const EdgeInsets.fromLTRB(26, 0, 26, 26),
-            child: InkResponse(
-              onTap: () {},
-              child: Container(
-                  decoration: BoxDecoration(
-                    border: Border.all(
-                      color: Colors.grey,
-                      width: 1.2,
+        padding: const EdgeInsets.only(top: 25),
+        child: ListView.builder(
+            itemCount: allBookings.length + 1,
+            itemBuilder: (context, index) {
+              if (index == allBookings.length) {
+                return const Padding(
+                  padding: EdgeInsets.all(16.0),
+                  child: Center(
+                    child: Text(
+                      "This is the end of your bookings.",
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.normal,
+                        color: Colors.grey,
+                      ),
                     ),
                   ),
-                  child: (index == allBookings.length)
-                      ? Center(
-                          child: Padding(
-                            padding: EdgeInsets.all(16.0),
-                            child: Text(
-                              "This is the end of your bookings.",
-                              style: TextStyle(
-                                  fontSize: 16, fontWeight: FontWeight.bold),
-                            ),
-                          ),
-                        )
-                      : BookingListTileUi(
-                          booking: allBookingsModel[index],
-                        )),
-            ),
-          );
-        },
-      ),
-    );
+                );
+              } else {
+                return Padding(
+                  padding: const EdgeInsets.fromLTRB(26, 0, 26, 20),
+                  child: InkResponse(
+                    child: Container(
+                      decoration: BoxDecoration(
+                        border: Border.all(
+                          color: Colors.grey,
+                          width: 1.2,
+                        ),
+                        borderRadius: BorderRadius.circular(5.0),
+                      ),
+                      child: BookingListTileUi(
+                        booking: allBookingsModel[index],
+                      ),
+                    ),
+                  ),
+                );
+              }
+            }));
   }
 }

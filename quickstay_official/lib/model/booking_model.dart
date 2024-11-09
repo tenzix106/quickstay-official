@@ -39,7 +39,6 @@ class BookingModel {
     timestamps.forEach((timestamp) {
       dates!.add(timestamp.toDate());
     });
-    print(this.posting?.name);
   }
 
   _loadContactInfo(String id, String fullName) {

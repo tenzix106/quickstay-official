@@ -318,4 +318,34 @@ class PostingModel {
       type: data['type'],
     );
   }
+
+  Future<void> fetchAndPopulatePostingData(String postingID) async {
+    // Fetch the posting document from Firestore
+    DocumentSnapshot snapshot = await FirebaseFirestore.instance
+        .collection('postings')
+        .doc(postingID)
+        .get();
+
+    // Check if the document exists
+    if (snapshot.exists) {
+      // Populate the PostingModel fields
+      id = snapshot.id;
+      name = snapshot['name'] ?? "";
+      city = snapshot['city'] ?? "";
+      type = snapshot['type'] ?? "";
+      address = snapshot['address'] ?? "";
+      description = snapshot['description'] ?? "";
+      price = snapshot['price']?.toDouble() ?? 0.0;
+      rating = snapshot['rating']?.toDouble() ?? 0.0;
+      verified = snapshot['verified'] ?? false;
+
+      // Retrieve imageNames
+      imageNames = List<String>.from(snapshot['imageNames'] ?? []);
+
+      // Optionally, you can also fetch the images from storage
+      await getAllImagesFromStorage();
+    } else {
+      print("Posting document does not exist.");
+    }
+  }
 }
