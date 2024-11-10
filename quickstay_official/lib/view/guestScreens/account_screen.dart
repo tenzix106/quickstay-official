@@ -45,6 +45,7 @@ class AccountScreenState extends State<AccountScreen> {
     } else {
       await userViewModel.becomeHost(FirebaseAuth.instance.currentUser!.uid);
       AppConstants.currentUser.isCurrentlyHosting = true;
+      _updateHostingTitle();
       Get.to(HostHomeScreen());
     }
   }
