@@ -50,11 +50,14 @@ class _ExploreScreenState extends State<ExploreScreen> {
               .where('name', isLessThanOrEqualTo: searchText + '\uf8ff');
           break;
         case "city":
+          print("Searching by City....");
           query = query
               .where('city', isGreaterThanOrEqualTo: searchText)
               .where('city', isLessThanOrEqualTo: searchText + '\uf8ff');
           break;
         case "type":
+          print("Search by Type...");
+          print("Search for: $searchText");
           query = query
               .where('type', isGreaterThanOrEqualTo: searchText)
               .where('type', isLessThanOrEqualTo: searchText + '\uf8ff');
@@ -62,17 +65,21 @@ class _ExploreScreenState extends State<ExploreScreen> {
       }
     }
 
-    setState(() {
-      _searchStream = query.snapshots();
-    });
+    if (_searchStream != query.snapshots()) {
+      setState(() {
+        _searchStream = query.snapshots();
+      });
+    }
   }
 
   void searchByField() {
     if (_debounce?.isActive ?? false) _debounce!.cancel();
     _debounce = Timer(const Duration(milliseconds: 600), () {
-      setState(() {
-        _updateSearchStream();
-      }); // Trigger a rebuild to update the StreamBuilder
+      if (mounted) {
+        setState(() {
+          _updateSearchStream();
+        });
+      }
     });
   }
 
@@ -189,6 +196,13 @@ class _ExploreScreenState extends State<ExploreScreen> {
             StreamBuilder(
                 stream: _searchStream,
                 builder: (context, dataSnapshots) {
+                  if (dataSnapshots.connectionState ==
+                      ConnectionState.waiting) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
+                  if (dataSnapshots.hasError) {
+                    return Center(child: Text('Error: ${dataSnapshots.error}'));
+                  }
                   if (dataSnapshots.hasData) {
                     // debugging statement to confirm search
                     for (var doc in dataSnapshots.data!.docs) {
@@ -214,17 +228,6 @@ class _ExploreScreenState extends State<ExploreScreen> {
                         PostingModel cPosting = PostingModel(id: snapshot.id);
 
                         cPosting.getPostingInfoFromSnapshot(snapshot);
-
-                        // Debugging: Print the posting being displayed
-                        print(
-                            'Displaying Posting: ${cPosting.name} with ID: ${cPosting.id}');
-
-                        // Debugging statement to check the title being displayed
-                        print(
-                            'Grid Item Title: ${cPosting.name}'); // Assuming 'name' is the title
-
-                        // debugging statement to check posting model
-                        print('PostingModel: ${cPosting.toString()}');
 
                         return InkResponse(
                           enableFeedback: true,
